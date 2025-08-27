@@ -6,7 +6,7 @@ export default function Home() {
         className="bg-brand-primary text-white"
         /* To use a background image later: add 'bg-cover bg-center' and style={{ backgroundImage: "url('/path/to/image.jpg')" }} */
       >
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24 sm:px-6">
+        <div className="content py-16 sm:py-24 text-white">
           <div className="mx-auto max-w-3xl">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl text-center sm:text-left">
               Your Career Agent, always by your side.
@@ -34,8 +34,9 @@ export default function Home() {
       </section>
 
       {/* Audience cards */}
-      <section className="mx-auto mt-6 max-w-7xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <section className="mt-6">
+        <div className="content">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-brand-muted bg-white p-6 shadow-sm/0 transition hover:shadow-md">
             <h2 className="text-xl font-semibold text-brand-text">For Job Seekers</h2>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-brand-text/80">
@@ -52,16 +53,19 @@ export default function Home() {
               <li>Retention from day one</li>
             </ul>
           </div>
+          </div>
         </div>
       </section>
 
       {/* Shared Values */}
-      <section className="mx-auto mt-12 max-w-5xl px-4 sm:px-6">
-        <h3 className="text-2xl font-semibold text-brand-text">Work is about people.</h3>
-        <p className="mt-3 text-brand-text/80">
-          We believe careers and companies flourish when people feel supported.
-          That’s why we focus on the human experience behind every role and every hire.
-        </p>
+      <section className="mt-12">
+        <div className="content">
+          <h3 className="text-2xl font-semibold text-brand-text">Work is about people.</h3>
+          <p className="mt-3 text-brand-text/80">
+            We believe careers and companies flourish when people feel supported.
+            That’s why we focus on the human experience behind every role and every hire.
+          </p>
+        </div>
       </section>
     </main>
   );

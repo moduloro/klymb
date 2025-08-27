@@ -9,7 +9,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-brand-muted">
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
+      <div className="content flex items-center gap-4 py-3">
         {/* Left: Logo */}
         <div className="shrink-0">
           <Link href="/" className="text-xl font-bold tracking-tight text-brand-text">
