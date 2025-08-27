@@ -1,0 +1,32 @@
+name: Uptime Check
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Render"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  ping:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+    steps:
+      - name: Wait for deploy and ping site
+        run: |
+          set -e
+          URL="${SITE_URL:-https://klymb.work}"
+          echo "Target: $URL"
+          for i in {1..30}; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+            echo "Attempt $i -> HTTP $CODE"
+            if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
+              echo "Uptime OK"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Site did not return 2xx/3xx within the time window" >&2
+          exit 1
+
