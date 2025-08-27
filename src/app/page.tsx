@@ -28,7 +28,7 @@ export default function Home() {
                 href="#"
                 className="inline-flex items-center justify-center rounded-md border border-white px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                I need talent
+                Grow the best team
               </a>
             </div>
           </div>
