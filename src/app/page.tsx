@@ -20,7 +20,7 @@ export default function Home() {
                 href="#"
                 className="inline-flex items-center justify-center rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-primary shadow-sm transition hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                I'm looking for a job
+                I’m looking for a job
               </a>
               <a
                 href="#"
