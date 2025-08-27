@@ -17,7 +17,7 @@ export default function Home() {
               We guide people and teams through the moments that matter – with clarity,
               empathy, and practical support, so you can move forward with confidence.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center justify-center sm:justify-center">
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row justify-center">
               <a
                 href="#"
                 className="inline-flex items-center justify-center rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-primary shadow-sm transition hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
