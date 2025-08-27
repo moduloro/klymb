@@ -70,7 +70,7 @@ export default function Home() {
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
-                  src="/images/corp-hr1.jpg"
+                  src="/images/corp-hr2.jpg"
                   alt="For Employers"
                   fill
                   className="object-cover"
