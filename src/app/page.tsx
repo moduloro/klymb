@@ -36,7 +36,7 @@ export default function Home() {
       </section>
 
       {/* Audience tiles */}
-      <section className="mt-6 bg-white">
+      <section className="mt-12 bg-white">
         <div className="content">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <a
@@ -46,7 +46,7 @@ export default function Home() {
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
-                  src="/globe.svg"
+                  src="/images/youngwoman_laptop2.jpg"
                   alt="For Job Seekers"
                   fill
                   className="object-cover"
@@ -70,7 +70,7 @@ export default function Home() {
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
-                  src="/window.svg"
+                  src="/images/corp-hr1.jpg"
                   alt="For Employers"
                   fill
                   className="object-cover"
