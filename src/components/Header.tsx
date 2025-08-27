@@ -73,7 +73,7 @@ export default function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-brand-muted bg-white text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <span className="relative block h-4 w-4">
               <span
