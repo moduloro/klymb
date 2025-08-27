@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image"; // <-- added
+import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Header() {
@@ -48,15 +48,13 @@ export default function Header() {
               {session.user?.image ? (
                 <Image
                   src={session.user.image}
-                  alt={session.user?.name ?? session.user?.email ?? "User avatar"}
+                  alt={session.user?.name ?? "User avatar"}
                   width={32}
                   height={32}
                   className="h-8 w-8 rounded-full border border-brand-muted object-cover"
                 />
               ) : null}
-              <span className="hidden text-sm text-brand-text/80 sm:inline-block" aria-label="Signed in user">
-                {session.user?.email ?? session.user?.name ?? "Signed in"}
-              </span>
+              {/* TODO: Profile dropdown (profile, settings, etc.) */}
               <button
                 onClick={() => signOut()}
                 className="inline-flex items-center rounded-md border border-brand-muted bg-white px-3 py-2 text-sm font-medium text-brand-text hover:bg-brand-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
