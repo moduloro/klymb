@@ -4,11 +4,12 @@
   --background: #ffffff;
   --foreground: #171717;
   /* Brand tokens */
-  --brand-bg: #f9fafb; /* soft off-white */
+  --brand-bg: #ffffff; /* site background set to white */
   --brand-text: #0a0a0a; /* near-black */
   --brand-primary: #306EAA; /* brand primary blue */
   --brand-accent: #ff6a13; /* manpower-like orange */
   --brand-muted: #e5e7eb; /* subtle gray */
+  --brand-grey-tiles: #F5F5F7; /* tile lower background */
 }
 
 @theme inline {
@@ -22,6 +23,7 @@
   --color-brand-primary: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
   --color-brand-muted: var(--brand-muted);
+  --color-brand-grey-tiles: var(--brand-grey-tiles);
 }
 
 @media (prefers-color-scheme: dark) {
