@@ -3,6 +3,24 @@
 import { useEffect, useState } from "react";
 import PrivacyPolicyContent from "@/components/PrivacyPolicyContent";
 
+// Helper to bind media query change listeners across browsers (modern and legacy)
+function bindMediaQuery(
+  mq: MediaQueryList,
+  cb: (ev: { matches: boolean }) => void
+): () => void {
+  const handler = (e: MediaQueryListEvent) => cb(e);
+  if ("addEventListener" in mq) {
+    mq.addEventListener("change", handler as unknown as EventListener);
+    return () => mq.removeEventListener("change", handler as unknown as EventListener);
+  }
+  type MediaQueryListLegacy = {
+    addListener: (listener: (this: MediaQueryList, ev: MediaQueryListEvent) => void) => void;
+    removeListener: (listener: (this: MediaQueryList, ev: MediaQueryListEvent) => void) => void;
+  };
+  (mq as unknown as MediaQueryListLegacy).addListener(handler);
+  return () => (mq as unknown as MediaQueryListLegacy).removeListener(handler);
+}
+
 type Consent = {
   necessary: true; // always true
   analytics: boolean;
@@ -87,13 +105,10 @@ export default function CookieConsent() {
 
   // Track breakpoint to decide whether to offset by footer height (>= md)
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const handler = () => setUseFooterOffset(mq.matches);
-    handler();
-    mq.addEventListener ? mq.addEventListener('change', handler) : mq.addListener(handler as any);
-    return () => {
-      mq.removeEventListener ? mq.removeEventListener('change', handler) : mq.removeListener(handler as any);
-    };
+    const mq = window.matchMedia("(min-width: 768px)");
+    setUseFooterOffset(mq.matches);
+    const cleanup = bindMediaQuery(mq, (e) => setUseFooterOffset(e.matches));
+    return cleanup;
   }, []);
 
   function animateCloseAfter(action: () => void) {
