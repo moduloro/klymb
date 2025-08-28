@@ -3,12 +3,20 @@ import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { saveUserSettings, getUserSettings } from "@/lib/userSettings";
 
+type Payload = { cc?: string; lang?: string };
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { cc, lang } = await req.json().catch(() => ({} as any));
+  let body: Payload = {};
+  try {
+    body = (await req.json()) as Payload;
+  } catch {
+    body = {};
+  }
+  const { cc, lang } = body;
   const country = typeof cc === "string" ? cc.toUpperCase() : undefined;
   const language = typeof lang === "string" ? lang.toLowerCase() : undefined;
   if (!country || !language) {
