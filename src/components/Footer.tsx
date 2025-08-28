@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="mt-16 border-t border-brand-muted bg-brand-grey-tiles">
+    <footer className="relative z-[60] mt-16 border-t border-brand-muted bg-brand-grey-tiles">
       <div className="content flex flex-col items-center justify-between gap-3 py-6 text-xs text-brand-text/60 sm:flex-row">
         <p>© {new Date().getFullYear()} Klymb</p>
         <nav className="flex items-center gap-4">
