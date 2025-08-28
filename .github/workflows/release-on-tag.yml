@@ -11,8 +11,48 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Create GitHub Release
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          echo "Tag: $TAG"
+          if [ ! -f CHANGELOG.md ]; then
+            echo "CHANGELOG.md not found" >&2
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Extract section that starts with "## [<tag>]" until the next "## ["
+          awk -v tag="$TAG" '
+            BEGIN { found=0 }
+            /^## \[/ {
+              if (found) exit
+            }
+            $0 ~ "^## \\[" tag "\\]" { found=1; next }
+            found { print }
+          ' CHANGELOG.md | sed '/^\s*$/d' > RELEASE_NOTES.md || true
+
+          if [ -s RELEASE_NOTES.md ]; then
+            echo "Found notes for $TAG"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "path=RELEASE_NOTES.md" >> "$GITHUB_OUTPUT"
+          else
+            echo "No notes found for $TAG"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release (from CHANGELOG)
+        if: steps.notes.outputs.found == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: ${{ steps.notes.outputs.path }}
+
+      - name: Create GitHub Release (auto notes)
+        if: steps.notes.outputs.found != 'true'
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-
