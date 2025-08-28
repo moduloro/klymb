@@ -9,8 +9,13 @@ export default function Header() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [profilePage, setProfilePage] = useState<"overview" | "account">("overview");
   const profileRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
+  function closeProfileDrawer() {
+    setProfileOpen(false);
+    setProfilePage("overview");
+  }
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setProfileOpen(false);
@@ -23,7 +28,7 @@ export default function Header() {
       // Ignore clicks inside the panel or on the profile toggle button
       if (panel.contains(target)) return;
       if (button && button.contains(target)) return;
-      setProfileOpen(false);
+      closeProfileDrawer();
     }
     if (profileOpen) {
       document.addEventListener("keydown", onKey);
@@ -71,8 +76,12 @@ export default function Header() {
             aria-label={profileOpen ? "Close profile" : "Open profile"}
             aria-expanded={profileOpen}
             onClick={() => {
-              // If open, close; otherwise open (explicit for clarity)
-              setProfileOpen((v) => (v ? false : true));
+              // Toggle drawer; reset subpage to overview when opening
+              setProfileOpen((v) => {
+                if (v) return false;
+                setProfilePage("overview");
+                return true;
+              });
             }}
             className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
@@ -122,122 +131,151 @@ export default function Header() {
           </button>
         </div>
       </div>
-      {/* Mobile drawer */}
-      <div className={`md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`}>
-        {/* Backdrop */}
-        <div
-          onClick={() => setOpen(false)}
-          className={`fixed inset-0 bg-black/30 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
-        />
-        {/* Panel */}
-        <div
-          id="mobile-menu"
-          className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85%] transform bg-white shadow-xl transition-transform duration-200 ${open ? "translate-x-0" : "-translate-x-full"}`}
-        >
-          <div className="flex items-center justify-end p-2">
-            <button
-              aria-label="Close"
-              onClick={() => setOpen(false)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-brand-text text-2xl leading-none hover:bg-brand-grey-tiles focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-            >
-              ×
-            </button>
+      
+    </header>
+    {/* Mobile top drawer (moved outside header for smoothness) */}
+    <div className={`md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`}>
+      {/* Backdrop below header */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`fixed inset-x-0 top-14 bottom-0 z-30 bg-white/0 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+      />
+      {/* Panel from top */}
+      <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        className={`fixed left-0 right-0 top-14 z-40 h-[56vh] max-h-[56vh] transform bg-brand-grey-tiles transition-transform duration-200 shadow-[0_10px_10px_rgba(0,0,0,0.15)] ${open ? "translate-y-0" : "-translate-y-[100vh]"}`}
+      >
+        <div className="h-full overflow-auto">
+          <div className="content py-4">
+            <nav className="flex flex-col gap-1 text-brand-text">
+              <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
+                For Job Seekers
+              </Link>
+              <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
+                For Employers
+              </Link>
+              <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
+                Insights & Resources
+              </Link>
+              <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
+                About
+              </Link>
+              {/* Footer actions */}
+              <div className="mt-auto pt-4">
+                {!session && (
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      signIn("google", { prompt: "select_account" });
+                    }}
+                    className="w-full rounded-md bg-brand-primary px-3 py-2 text-sm font-medium text-white"
+                  >
+                    Sign in
+                  </button>
+                )}
+              </div>
+            </nav>
           </div>
-          <nav className="flex h-[calc(100%-44px)] flex-col gap-1 px-4 pb-4 text-brand-text">
-            <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-              For Job Seekers
-            </Link>
-            <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-              For Employers
-            </Link>
-            <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-              Insights & Resources
-            </Link>
-            <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-              About
-            </Link>
-            {/* Removed Profile from mobile menu; available via user icon drawer */}
-            <div className="mt-auto pt-4">
-              {!session && (
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    signIn("google", { prompt: "select_account" });
-                  }}
-                  className="w-full rounded-md bg-brand-primary px-3 py-2 text-sm font-medium text-white"
-                >
-                  Sign in
-                </button>
-              )}
-              {/* Removed Sign out from hamburger; available via profile drawer */}
-            </div>
-          </nav>
         </div>
       </div>
-    </header>
+    </div>
     {/* Profile top drawer */}
     <div className={`${profileOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
       {/* Backdrop with blur only (no darkening), keep header visible */}
       <div
         className={`fixed inset-x-0 top-14 bottom-0 z-30 bg-white/0 backdrop-blur-sm transition-opacity ${profileOpen ? "opacity-100" : "opacity-0"}`}
-        onClick={() => setProfileOpen(false)}
+        onClick={closeProfileDrawer}
       />
       {/* Panel */}
       <div
         role="dialog"
         aria-modal="true"
-        className={`fixed left-0 right-0 top-14 z-40 h-[80vh] max-h-[80vh] transform bg-brand-grey-tiles transition-transform duration-200 ${profileOpen ? "translate-y-0" : "-translate-y-[100vh]"}`}
+        className={`fixed left-0 right-0 top-14 z-40 h-[56vh] max-h-[56vh] transform bg-brand-grey-tiles transition-transform duration-200 shadow-[0_10px_10px_rgba(0,0,0,0.15)] ${profileOpen ? "translate-y-0" : "-translate-y-[100vh]"}`}
       >
         <div ref={profileRef} className="h-full overflow-auto">
-          <div className="content py-4">
-            <div className="flex items-start justify-between">
-              <h2 className="text-lg font-semibold text-brand-text">Your profile</h2>
-            </div>
-            <div className="mt-4 flex items-center gap-4">
-              <Image
-                src="/images/user-outline.svg"
-                alt="User avatar"
-                width={48}
-                height={48}
-                className="h-12 w-12"
-              />
-              <div>
-                <p className="text-base font-medium text-brand-text">{session?.user?.name ?? "Guest"}</p>
-                <p className="text-sm text-brand-text/70">{session?.user?.email ?? "Not signed in"}</p>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-col gap-2 text-sm">
-              {session ? (
-                <>
-                  <Link
-                    href="/profile"
-                    onClick={() => setProfileOpen(false)}
-                    className="text-brand-text hover:underline"
-                  >
-                    Account
-                  </Link>
+          <div className="content py-4 h-full">
+            {profilePage === "overview" ? (
+              <>
+                <div className="flex items-start justify-between">
+                  <h2 className="text-lg font-semibold text-brand-text">Your profile</h2>
+                </div>
+                <div className="mt-4 flex items-center gap-4">
+                  <Image
+                    src="/images/user-outline.svg"
+                    alt="User avatar"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12"
+                  />
+                  <div>
+                    <p className="text-base font-medium text-brand-text">{session?.user?.name ?? "Guest"}</p>
+                    <p className="text-sm text-brand-text/70">{session?.user?.email ?? "Not signed in"}</p>
+                  </div>
+                </div>
+                <div className="mt-6 flex flex-col gap-2 text-sm">
+                  {session ? (
+                    <>
+                      <button
+                        onClick={() => setProfilePage("account")}
+                        className="text-left text-brand-text hover:underline focus:outline-none"
+                      >
+                        Account
+                      </button>
+                      <button
+                        onClick={() => {
+                          signOut();
+                          closeProfileDrawer();
+                        }}
+                        className="text-left text-brand-text hover:underline focus:outline-none"
+                      >
+                        Sign out
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        signIn("google", { prompt: "select_account" });
+                        closeProfileDrawer();
+                      }}
+                      className="text-left text-brand-text hover:underline focus:outline-none"
+                    >
+                      Sign in
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="relative h-full">
+                <div className="flex items-start justify-between">
+                  <h2 className="text-lg font-semibold text-brand-text">Account</h2>
                   <button
-                    onClick={() => {
-                      signOut();
-                      setProfileOpen(false);
-                    }}
-                    className="text-left text-brand-text hover:underline focus:outline-none"
+                    onClick={() => setProfilePage("overview")}
+                    className="text-xs text-brand-text/70 hover:text-brand-text focus:outline-none"
                   >
-                    Sign out
+                    &lt; Back
                   </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => {
-                    signIn("google", { prompt: "select_account" });
-                    setProfileOpen(false);
-                  }}
-                  className="text-left text-brand-text hover:underline focus:outline-none"
-                >
-                  Sign in
-                </button>
-              )}
-            </div>
+                </div>
+                <div className="mt-4">
+                  <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-brand-muted">
+                    <div className="flex items-center gap-4 p-6">
+                      <Image
+                        src="/images/user-generic.svg"
+                        alt={session?.user?.name ?? session?.user?.email ?? "User avatar"}
+                        width={64}
+                        height={64}
+                        className="h-16 w-16 rounded-full ring-1 ring-brand-muted object-cover"
+                      />
+                      <div>
+                        <p className="text-lg font-medium text-brand-text">{session?.user?.name ?? "Unnamed"}</p>
+                        <p className="text-sm text-brand-text/70">{session?.user?.email ?? ""}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
