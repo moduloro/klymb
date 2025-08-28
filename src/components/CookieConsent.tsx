@@ -126,10 +126,34 @@ export default function CookieConsent() {
     setCustomize(returnToCustomize);
   }
 
+  // Prevent page scroll when the cookie drawer requires focus (policy or customize)
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    if (mounted && show && (policyOpen || customize)) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = prev || "";
+    }
+    return () => {
+      document.body.style.overflow = prev || "";
+    };
+  }, [mounted, show, policyOpen, customize]);
+
   if (!mounted) return null;
 
   return (
-    <div className="fixed inset-x-0 z-40" style={{ bottom: useFooterOffset ? footerOffset : 0 }}>
+    <>
+      {/* Backdrop: only when policy or customize is open. Blur only for policy. */}
+      {(policyOpen || customize) && (
+        <div
+          className={`fixed inset-x-0 top-0 z-30 ${policyOpen ? "backdrop-blur-sm" : ""} transition-opacity ${
+            show ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ bottom: useFooterOffset ? footerOffset : 0 }}
+          onClick={policyOpen ? closePolicy : undefined}
+        />
+      )}
+      <div className="fixed inset-x-0" style={{ bottom: useFooterOffset ? footerOffset : 0, zIndex: useFooterOffset ? 40 : 70 }}>
       <div
         className={`mx-auto max-w-none bg-brand-grey-tiles shadow-[0_-10px_10px_rgba(0,0,0,0.15)] transform transition-transform duration-200 ${
           show ? "translate-y-0" : "translate-y-full"
@@ -252,7 +276,8 @@ export default function CookieConsent() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
