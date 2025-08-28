@@ -8,6 +8,10 @@
   --brand-text: #0a0a0a; /* near-black */
   --brand-primary: #306EAA; /* brand primary blue */
   --brand-accent: #ff6a13; /* manpower-like orange */
+  --brand-accent-strong: hsl(24 100% 50%); /* brighter, fully saturated orange */
+  --brand-accent-strong-1: hsl(22 100% 50%);
+  --brand-accent-strong-2: hsl(24 100% 50%);
+  --brand-accent-strong-3: hsl(26 100% 50%);
   --brand-muted: #e5e7eb; /* subtle gray */
   --brand-grey-tiles: #F5F5F7; /* tile lower background */
 }
@@ -56,3 +60,106 @@ body.no-scroll {
     padding-inline: 1.5rem;
   }
 }
+
+/* Animated "lava-lamp" gradient background utilities */
+.lava-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.lava-blob {
+  position: absolute;
+  width: 55vmax;
+  height: 55vmax;
+  border-radius: 50%;
+  /* Reduce default blur for harder edges */
+  filter: blur(var(--blur, 12px));
+  opacity: 0; /* start invisible; fade in via animation */
+  will-change: transform, opacity;
+}
+.lava-primary {
+  background: radial-gradient(circle at 50% 50%, var(--brand-primary) 0 72%, transparent 73%);
+}
+/* Narrower default gradient band for crisper edge */
+.lava-accent-1 { background: radial-gradient(ellipse at 50% 50%, var(--brand-accent-strong-1) 0 var(--inner-stop, 76%), transparent var(--outer-stop, 76.6%)); }
+.lava-accent-2 { background: radial-gradient(ellipse at 50% 50%, var(--brand-accent-strong-2) 0 var(--inner-stop, 76%), transparent var(--outer-stop, 76.6%)); }
+.lava-accent-3 { background: radial-gradient(ellipse at 50% 50%, var(--brand-accent-strong-3) 0 var(--inner-stop, 76%), transparent var(--outer-stop, 76.6%)); }
+
+/* Up/down float plus subtle amoeba-like shape shifting */
+@keyframes blob-move-1 {
+  0% { transform: translate(0%, 25%) scaleX(1.15) scaleY(0.9) rotate(0deg); }
+  50% { transform: translate(0%, -15%) scaleX(0.9) scaleY(1.1) rotate(6deg); }
+  100% { transform: translate(0%, 20%) scaleX(1.2) scaleY(0.85) rotate(-4deg); }
+}
+@keyframes blob-move-2 {
+  0% { transform: translate(10%, -20%) scaleX(0.95) scaleY(1.05) rotate(-5deg); }
+  50% { transform: translate(-5%, 10%) scaleX(1.1) scaleY(0.9) rotate(3deg); }
+  100% { transform: translate(8%, -15%) scaleX(0.9) scaleY(1.15) rotate(-2deg); }
+}
+@keyframes blob-move-3 {
+  0% { transform: translate(-8%, 30%) scaleX(1.2) scaleY(0.85) rotate(4deg); }
+  50% { transform: translate(6%, -10%) scaleX(0.85) scaleY(1.2) rotate(-6deg); }
+  100% { transform: translate(-5%, 18%) scaleX(1.1) scaleY(0.9) rotate(2deg); }
+}
+.blob-1 { animation: blob-move-1 18s ease-in-out infinite alternate, blob-appear 2.2s ease forwards; }
+.blob-2 { animation: blob-move-2 22s ease-in-out infinite alternate, blob-appear 2.0s ease forwards; }
+.blob-3 { animation: blob-move-3 20s ease-in-out infinite alternate, blob-appear 2.4s ease forwards; }
+
+/* Additional paths to spawn bubbles across full banner width */
+@keyframes blob-move-4 {
+  0% { transform: translate(-12%, -25%) scaleX(1.05) scaleY(0.95) rotate(2deg); }
+  50% { transform: translate(4%, 12%) scaleX(0.9) scaleY(1.1) rotate(-4deg); }
+  100% { transform: translate(10%, -18%) scaleX(1.15) scaleY(0.85) rotate(5deg); }
+}
+@keyframes blob-move-5 {
+  0% { transform: translate(15%, 28%) scaleX(0.9) scaleY(1.1) rotate(-3deg); }
+  50% { transform: translate(-8%, -8%) scaleX(1.2) scaleY(0.85) rotate(6deg); }
+  100% { transform: translate(12%, 18%) scaleX(0.95) scaleY(1.05) rotate(-2deg); }
+}
+@keyframes blob-move-6 {
+  0% { transform: translate(-5%, -30%) scaleX(1.1) scaleY(0.9) rotate(5deg); }
+  50% { transform: translate(6%, 10%) scaleX(0.9) scaleY(1.15) rotate(-5deg); }
+  100% { transform: translate(-3%, -20%) scaleX(1.15) scaleY(0.85) rotate(3deg); }
+}
+.blob-4 { animation: blob-move-4 26s ease-in-out infinite alternate, blob-appear 2.6s ease forwards; }
+.blob-5 { animation: blob-move-5 30s ease-in-out infinite alternate, blob-appear 2.8s ease forwards; }
+.blob-6 { animation: blob-move-6 24s ease-in-out infinite alternate, blob-appear 2.3s ease forwards; }
+
+@keyframes blob-appear {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+
+/* New rise/fall animations with bounce at edges and oily shape shift */
+/* Rise/fall variants (previous version): primarily vertical with subtle horizontal drift */
+@keyframes blob-rise-1 {
+  0% { transform: translateY(32%) translateX(-6%) scaleX(1.15) scaleY(0.9) rotate(2deg); }
+  40% { transform: translateY(-18%) translateX(-2%) scaleX(0.9) scaleY(1.15) rotate(-4deg); }
+  50% { transform: translateY(-14%) translateX(0%) scaleX(1.05) scaleY(0.95) rotate(1deg); } /* bounce overshoot */
+  60% { transform: translateY(-20%) translateX(2%) scaleX(0.85) scaleY(1.2) rotate(-3deg); }
+  100% { transform: translateY(30%) translateX(6%) scaleX(1.2) scaleY(0.85) rotate(3deg); }
+}
+@keyframes blob-rise-2 {
+  0% { transform: translateY(28%) translateX(4%) scaleX(0.95) scaleY(1.1) rotate(-3deg); }
+  45% { transform: translateY(-22%) translateX(1%) scaleX(1.15) scaleY(0.85) rotate(5deg); }
+  55% { transform: translateY(-16%) translateX(-1%) scaleX(0.9) scaleY(1.1) rotate(-2deg); }
+  100% { transform: translateY(26%) translateX(-4%) scaleX(1.1) scaleY(0.9) rotate(2deg); }
+}
+@keyframes blob-fall-1 {
+  0% { transform: translateY(-30%) translateX(6%) scaleX(1.1) scaleY(0.9) rotate(-2deg); }
+  40% { transform: translateY(18%) translateX(3%) scaleX(0.9) scaleY(1.15) rotate(3deg); }
+  50% { transform: translateY(14%) translateX(0%) scaleX(1.05) scaleY(0.95) rotate(-1deg); } /* bounce overshoot */
+  60% { transform: translateY(20%) translateX(-2%) scaleX(0.85) scaleY(1.2) rotate(2deg); }
+  100% { transform: translateY(-28%) translateX(-6%) scaleX(1.2) scaleY(0.85) rotate(-3deg); }
+}
+@keyframes blob-fall-2 {
+  0% { transform: translateY(-26%) translateX(-4%) scaleX(0.9) scaleY(1.15) rotate(4deg); }
+  45% { transform: translateY(22%) translateX(-1%) scaleX(1.15) scaleY(0.85) rotate(-5deg); }
+  55% { transform: translateY(16%) translateX(1%) scaleX(0.9) scaleY(1.1) rotate(2deg); }
+  100% { transform: translateY(-24%) translateX(4%) scaleX(1.1) scaleY(0.9) rotate(-2deg); }
+}
+
+.rise-1 { animation: blob-rise-1 26s ease-in-out infinite alternate; }
+.rise-2 { animation: blob-rise-2 32s ease-in-out infinite alternate; }
+.fall-1 { animation: blob-fall-1 28s ease-in-out infinite alternate; }
+.fall-2 { animation: blob-fall-2 36s ease-in-out infinite alternate; }

@@ -1,14 +1,18 @@
 import Image from "next/image";
+import HeroLava from "@/components/HeroLava";
 
 export default function Home() {
   return (
     <main>
       {/* Hero */}
       <section
-        className="bg-brand-primary text-white"
-        /* To use a background image later: add 'bg-cover bg-center' and style={{ backgroundImage: "url('/path/to/image.jpg')" }} */
+        className="relative text-white overflow-hidden"
+        /* Animated gradient background replaces solid color */
+        style={{ backgroundColor: "var(--brand-primary)" }}
       >
-        <div className="content py-16 sm:py-24 text-white">
+        {/* Animated lava-lamp gradient background (client-rendered for randomness) */}
+        <HeroLava />
+        <div className="relative z-10 content py-16 sm:py-24 text-white">
           <div className="mx-auto max-w-3xl">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl text-center sm:text-center">
               Your Career Agent,<br /> always by your side.
