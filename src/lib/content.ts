@@ -11,16 +11,28 @@ export type HomeContent = {
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function deepMerge<T>(base: T, patch: DeepPartial<T>): T {
-  const out: any = Array.isArray(base) ? [...(base as any)] : { ...(base as any) };
-  for (const [k, v] of Object.entries(patch ?? {})) {
-    if (v && typeof v === "object" && !Array.isArray(v)) {
-      out[k] = deepMerge((out[k] ?? {}) as any, v as any);
-    } else if (v !== undefined) {
-      out[k] = v;
+  // Replace arrays wholesale when provided in patch
+  if (Array.isArray(patch)) return patch as unknown as T;
+  if (!isPlainObject(base)) return (patch as T) ?? base;
+  if (!isPlainObject(patch)) return base;
+
+  const result: Record<string, unknown> = { ...(base as unknown as Record<string, unknown>) };
+  const patchObj = patch as unknown as Record<string, unknown>;
+  for (const [k, v] of Object.entries(patchObj)) {
+    if (v === undefined) continue;
+    const baseVal = (base as unknown as Record<string, unknown>)[k];
+    if (isPlainObject(v) && isPlainObject(baseVal)) {
+      result[k] = deepMerge(baseVal, v as unknown as DeepPartial<unknown>) as unknown;
+    } else {
+      result[k] = v as unknown;
     }
   }
-  return out as T;
+  return result as T;
 }
 
 async function readJSON<T>(p: string): Promise<T | null> {
@@ -44,4 +56,3 @@ export async function getHomeContent(cc: string, lang: string): Promise<HomeCont
   if (ccLang) merged = deepMerge(merged, ccLang);
   return merged;
 }
-
