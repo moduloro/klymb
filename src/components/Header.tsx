@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Header() {
@@ -10,16 +11,26 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profilePage, setProfilePage] = useState<"overview" | "account">("overview");
+  const [localeOpen, setLocaleOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
+  const localeRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const cc = (searchParams.get("cc") ?? "US").toUpperCase();
+  const lang = (searchParams.get("lang") ?? "en").toLowerCase();
+  const flagSrc = cc === "DE" ? "/flags/de.svg" : cc === "UK" ? "/flags/uk.svg" : "/flags/us.svg";
   function closeProfileDrawer() {
     setProfileOpen(false);
     setProfilePage("overview");
   }
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setProfileOpen(false);
+      if (e.key === "Escape") {
+        setProfileOpen(false);
+        setLocaleOpen(false);
+      }
     }
     function onClick(e: MouseEvent) {
       const target = e.target as Node;
@@ -41,15 +52,35 @@ export default function Header() {
     };
   }, [profileOpen]);
 
+  // Close locale dropdown on outside click
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setLocaleOpen(false);
+    }
+    function onClick(e: MouseEvent) {
+      const el = localeRef.current;
+      if (!el) return;
+      if (!el.contains(e.target as Node)) setLocaleOpen(false);
+    }
+    if (localeOpen) {
+      document.addEventListener("keydown", onKey);
+      document.addEventListener("mousedown", onClick);
+    }
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [localeOpen]);
+
   // Block background scroll when any header drawer is open
   useEffect(() => {
-    if (open || profileOpen) {
+    if (open || profileOpen || localeOpen) {
       document.body.classList.add("no-scroll");
     } else {
       document.body.classList.remove("no-scroll");
     }
     return () => document.body.classList.remove("no-scroll");
-  }, [open, profileOpen]);
+  }, [open, profileOpen, localeOpen]);
 
   // Toggle subtle drop shadow when page is scrolled behind the fixed header
   useEffect(() => {
@@ -62,10 +93,16 @@ export default function Header() {
   // Ensure drawers are mutually exclusive
   useEffect(() => {
     if (open) setProfileOpen(false);
+    if (open) setLocaleOpen(false);
   }, [open]);
   useEffect(() => {
     if (profileOpen) setOpen(false);
+    if (profileOpen) setLocaleOpen(false);
   }, [profileOpen]);
+  useEffect(() => {
+    if (localeOpen) setOpen(false);
+    if (localeOpen) setProfileOpen(false);
+  }, [localeOpen]);
 
   return (
     <>
@@ -83,7 +120,7 @@ export default function Header() {
         </div>
 
         {/* Center/Right: Nav */}
-        <nav className="ml-2 hidden items-center gap-6 text-sm text-brand-text/80 md:flex">
+        <nav className="ml-2 hidden items-center gap-6 text-sm text-brand-text/80 md:flex relative top-[2px]">
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
             For Job Seekers
           </Link>
@@ -100,6 +137,49 @@ export default function Header() {
 
         {/* Right: Auth + Mobile toggle */}
         <div className="ml-auto flex items-center gap-3">
+          {/* Country flag selector */}
+          <div className="relative" ref={localeRef}>
+            <button
+              type="button"
+              aria-label="Select region and language"
+              aria-expanded={localeOpen}
+              onClick={() => setLocaleOpen((v) => !v)}
+              className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary h-6 w-6 overflow-hidden relative top-[1px]"
+            >
+              <Image src={flagSrc} alt={`${cc}-${lang}`} width={19} height={19} className="block h-[19px] w-[19px] rounded-full object-cover" />
+            </button>
+            {/* Dropdown */}
+            <div className={`absolute right-0 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-brand-muted transition ${localeOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+              <div className="py-2 text-sm text-brand-text">
+                {[
+                  { cc: "US", lang: "en", label: "United States — English", flag: "/flags/us.svg" },
+                  { cc: "UK", lang: "en", label: "United Kingdom — English", flag: "/flags/uk.svg" },
+                  { cc: "DE", lang: "de", label: "Deutschland — Deutsch", flag: "/flags/de.svg" },
+                ].map((opt) => (
+                  <button
+                    key={`${opt.cc}-${opt.lang}`}
+                    onClick={() => {
+                      // Persist as cookies for server reads
+                      const maxAge = 60 * 60 * 24 * 180; // ~6 months
+                      document.cookie = `cc=${opt.cc}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                      document.cookie = `lang=${opt.lang}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                      const params = new URLSearchParams(Array.from(searchParams?.entries() ?? []));
+                      params.set("cc", opt.cc);
+                      params.set("lang", opt.lang);
+                      router.push(`/?${params.toString()}`);
+                      setLocaleOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 hover:bg-brand-grey-tiles text-left"
+                  >
+                    <Image src={opt.flag} alt="" width={20} height={20} className="h-5 w-5 rounded-full" />
+                    <span>{opt.label}</span>
+                    {cc === opt.cc && lang === opt.lang && <span className="ml-auto text-xs text-brand-text/60">Current</span>}
+                  </button>
+                ))}
+                <div className="px-3 pt-1 text-xs text-brand-text/60">Note: EN content differs by country.</div>
+              </div>
+            </div>
+          </div>
           {/* User avatar button opens profile drawer */}
           <button
             ref={profileButtonRef}
@@ -116,7 +196,7 @@ export default function Header() {
               // Close other drawers
               setOpen(false);
             }}
-            className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary relative -top-[1px]"
           >
             <span className="relative block h-6 w-6 pointer-events-none">
               {/* User icon fades out when drawer is open */}

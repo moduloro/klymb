@@ -3,8 +3,9 @@ import HeroLava from "@/components/HeroLava";
 import { resolveAudience } from "@/lib/locale";
 import { getHomeContent } from "@/lib/content";
 
-export default async function Home({ searchParams }: { searchParams?: { cc?: string; lang?: string } }) {
-  const audience = resolveAudience({ cc: searchParams?.cc ?? null, lang: searchParams?.lang ?? null });
+export default async function Home({ searchParams }: { searchParams: Promise<{ cc?: string; lang?: string }> }) {
+  const sp = await searchParams;
+  const audience = await resolveAudience({ cc: sp?.cc ?? null, lang: sp?.lang ?? null });
   const content = await getHomeContent(audience.cc, audience.lang);
   return (
     <main>
@@ -56,6 +57,7 @@ export default async function Home({ searchParams }: { searchParams?: { cc?: str
                   src="/images/youngwoman_laptop2.jpg"
                   alt="For Job Seekers"
                   fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-cover"
                   priority
                 />
@@ -80,6 +82,7 @@ export default async function Home({ searchParams }: { searchParams?: { cc?: str
                   src="/images/corp-hr3.jpg"
                   alt="For Employers"
                   fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-cover"
                 />
               </div>
