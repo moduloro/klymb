@@ -2,10 +2,22 @@ import Image from "next/image";
 import HeroLava from "@/components/HeroLava";
 import { resolveAudience } from "@/lib/locale";
 import { getHomeContent } from "@/lib/content";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getUserSettings } from "@/lib/userSettings";
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ cc?: string; lang?: string }> }) {
   const sp = await searchParams;
-  const audience = await resolveAudience({ cc: sp?.cc ?? null, lang: sp?.lang ?? null });
+  let audience = await resolveAudience({ cc: sp?.cc ?? null, lang: sp?.lang ?? null });
+  const session = await getServerSession(authOptions);
+  if (session?.user?.email) {
+    const settings = await getUserSettings(session.user.email);
+    if (settings) {
+      audience = { cc: settings.country, lang: settings.language };
+    }
+  }
   const content = await getHomeContent(audience.cc, audience.lang);
   return (
     <main>

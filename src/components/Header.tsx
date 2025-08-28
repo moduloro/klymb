@@ -13,14 +13,52 @@ export default function Header() {
   const [profilePage, setProfilePage] = useState<"overview" | "account">("overview");
   const [localeOpen, setLocaleOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
   const localeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const cc = (searchParams.get("cc") ?? "US").toUpperCase();
-  const lang = (searchParams.get("lang") ?? "en").toLowerCase();
-  const flagSrc = cc === "DE" ? "/flags/de.svg" : cc === "UK" ? "/flags/uk.svg" : "/flags/us.svg";
+  function getCookie(name: string) {
+    if (typeof document === "undefined") return null;
+    const m = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\/\+^])/g, "\\$1") + "=([^;]*)"));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  const [currentCc, setCurrentCc] = useState<string>(((searchParams.get("cc") ?? getCookie("cc") ?? "US")).toUpperCase());
+  const [currentLang, setCurrentLang] = useState<string>(((searchParams.get("lang") ?? getCookie("lang") ?? "en")).toLowerCase());
+  // Keep flag state in sync when URL query changes (guest flow) or cookies change
+  useEffect(() => {
+    const spCc = ((searchParams.get("cc") ?? getCookie("cc") ?? "US")).toUpperCase();
+    const spLang = ((searchParams.get("lang") ?? getCookie("lang") ?? "en")).toLowerCase();
+    setCurrentCc(spCc);
+    setCurrentLang(spLang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams?.toString()]);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const appliedDbLocaleRef = useRef(false);
+  useEffect(() => {
+    // After sign-in, always mirror DB settings to cookies/state and normalize URL
+    if (session && !appliedDbLocaleRef.current) {
+      appliedDbLocaleRef.current = true;
+      fetch("/api/user/settings")
+        .then((r) => r.json())
+        .then((j: { cc: string | null; lang: string | null }) => {
+          if (j?.cc && j?.lang) {
+            const maxAge = 60 * 60 * 24 * 180; // ~6 months
+            document.cookie = `cc=${j.cc}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+            document.cookie = `lang=${j.lang}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+            setCurrentCc(j.cc.toUpperCase());
+            setCurrentLang(j.lang.toLowerCase());
+            // Clear any stale query params so header/content remain consistent
+            router.replace("/");
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session, router]);
+  const flagSrc = currentCc === "DE" ? "/flags/de.svg" : currentCc === "UK" ? "/flags/uk.svg" : "/flags/us.svg";
   function closeProfileDrawer() {
     setProfileOpen(false);
     setProfilePage("overview");
@@ -146,7 +184,13 @@ export default function Header() {
               onClick={() => setLocaleOpen((v) => !v)}
               className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary h-6 w-6 overflow-hidden relative top-[1px]"
             >
-              <Image src={flagSrc} alt={`${cc}-${lang}`} width={19} height={19} className="block h-[19px] w-[19px] rounded-full object-cover" />
+              <span suppressHydrationWarning>
+                {mounted ? (
+                  <Image src={flagSrc} alt={`${currentCc}-${currentLang}`} width={19} height={19} className="block h-[19px] w-[19px] rounded-full object-cover" />
+                ) : (
+                  <span className="block h-[19px] w-[19px] rounded-full bg-brand-muted" aria-hidden />
+                )}
+              </span>
             </button>
             {/* Dropdown */}
             <div className={`absolute right-0 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-brand-muted transition ${localeOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
@@ -158,11 +202,28 @@ export default function Header() {
                 ].map((opt) => (
                   <button
                     key={`${opt.cc}-${opt.lang}`}
-                    onClick={() => {
-                      // Persist as cookies for server reads
-                      const maxAge = 60 * 60 * 24 * 180; // ~6 months
-                      document.cookie = `cc=${opt.cc}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
-                      document.cookie = `lang=${opt.lang}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                    onClick={async () => {
+                      // If signed-in, persist server-side via API; else cookies
+                      try {
+                        if (session?.user?.email) {
+                          await fetch("/api/user/settings", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ cc: opt.cc, lang: opt.lang }),
+                          });
+                          // Also mirror to cookies so client header stays in sync
+                          const maxAge = 60 * 60 * 24 * 180; // ~6 months
+                          document.cookie = `cc=${opt.cc}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                          document.cookie = `lang=${opt.lang}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                        } else {
+                          const maxAge = 60 * 60 * 24 * 180; // ~6 months
+                          document.cookie = `cc=${opt.cc}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                          document.cookie = `lang=${opt.lang}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+                          // Update local state immediately for guest flow
+                          setCurrentCc(opt.cc.toUpperCase());
+                          setCurrentLang(opt.lang.toLowerCase());
+                        }
+                      } catch {}
                       const params = new URLSearchParams(Array.from(searchParams?.entries() ?? []));
                       params.set("cc", opt.cc);
                       params.set("lang", opt.lang);
@@ -173,7 +234,9 @@ export default function Header() {
                   >
                     <Image src={opt.flag} alt="" width={20} height={20} className="h-5 w-5 rounded-full" />
                     <span>{opt.label}</span>
-                    {cc === opt.cc && lang === opt.lang && <span className="ml-auto text-xs text-brand-text/60">Current</span>}
+                    {mounted && currentCc === opt.cc && currentLang === opt.lang && (
+                      <span className="ml-auto text-xs text-brand-text/60">Current</span>
+                    )}
                   </button>
                 ))}
                 <div className="px-3 pt-1 text-xs text-brand-text/60">Note: EN content differs by country.</div>
