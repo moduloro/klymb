@@ -10,13 +10,20 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setProfileOpen(false);
     }
     function onClick(e: MouseEvent) {
-      if (!profileRef.current) return;
-      if (!profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+      const target = e.target as Node;
+      const panel = profileRef.current;
+      const button = profileButtonRef.current;
+      if (!panel) return;
+      // Ignore clicks inside the panel or on the profile toggle button
+      if (panel.contains(target)) return;
+      if (button && button.contains(target)) return;
+      setProfileOpen(false);
     }
     if (profileOpen) {
       document.addEventListener("keydown", onKey);
@@ -53,30 +60,44 @@ export default function Header() {
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
             About
           </Link>
-          {session && (
-            <Link href="/profile" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
-              Profile
-            </Link>
-          )}
         </nav>
 
         {/* Right: Auth + Mobile toggle */}
         <div className="ml-auto flex items-center gap-3">
           {/* User avatar button opens profile drawer */}
           <button
+            ref={profileButtonRef}
             type="button"
-            aria-label="Open profile"
+            aria-label={profileOpen ? "Close profile" : "Open profile"}
             aria-expanded={profileOpen}
-            onClick={() => setProfileOpen(true)}
+            onClick={() => {
+              // If open, close; otherwise open (explicit for clarity)
+              setProfileOpen((v) => (v ? false : true));
+            }}
             className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
-            <Image
-              src="/images/user-outline.svg"
-              alt="Profile"
-              width={24}
-              height={24}
-              className="h-6 w-6"
-            />
+            <span className="relative block h-6 w-6 pointer-events-none">
+              {/* User icon fades out when drawer is open */}
+              <Image
+                src="/images/user-outline.svg"
+                alt="Profile"
+                width={24}
+                height={24}
+                className={`absolute inset-0 h-6 w-6 transition-opacity duration-200 ${profileOpen ? "opacity-0" : "opacity-100"}`}
+              />
+              {/* X icon fades in and is drawn with two bars, similar to hamburger morph */}
+              <span
+                aria-hidden
+                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${profileOpen ? "opacity-100" : "opacity-0"}`}
+              >
+                <span
+                  className={`absolute left-1 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current transition-transform duration-200 ${profileOpen ? "rotate-45" : "rotate-0"}`}
+                />
+                <span
+                  className={`absolute left-1 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current transition-transform duration-200 ${profileOpen ? "-rotate-45" : "rotate-0"}`}
+                />
+              </span>
+            </span>
           </button>
           {/* Mobile menu toggle */}
           <button
@@ -135,13 +156,9 @@ export default function Header() {
             <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
               About
             </Link>
-            {session && (
-              <Link href="/profile" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-                Profile
-              </Link>
-            )}
+            {/* Removed Profile from mobile menu; available via user icon drawer */}
             <div className="mt-auto pt-4">
-              {!session ? (
+              {!session && (
                 <button
                   onClick={() => {
                     setOpen(false);
@@ -151,17 +168,8 @@ export default function Header() {
                 >
                   Sign in
                 </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    signOut();
-                  }}
-                  className="w-full rounded-md border border-brand-muted bg-white px-3 py-2 text-sm font-medium text-brand-text"
-                >
-                  Sign out
-                </button>
               )}
+              {/* Removed Sign out from hamburger; available via profile drawer */}
             </div>
           </nav>
         </div>
@@ -184,13 +192,6 @@ export default function Header() {
           <div className="content py-4">
             <div className="flex items-start justify-between">
               <h2 className="text-lg font-semibold text-brand-text">Your profile</h2>
-              <button
-                aria-label="Close"
-                onClick={() => setProfileOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-brand-text text-2xl leading-none hover:bg-brand-grey-tiles focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-              >
-                ×
-              </button>
             </div>
             <div className="mt-4 flex items-center gap-4">
               <Image
