@@ -23,8 +23,8 @@ function rand(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
-function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pick<T extends readonly unknown[]>(arr: T): T[number] {
+  return arr[Math.floor(Math.random() * arr.length)] as T[number];
 }
 
 function makeBubbles(count: number): Bubble[] {
@@ -33,7 +33,7 @@ function makeBubbles(count: number): Bubble[] {
       const fromTop = Math.random() < 0.5; // origin: top or bottom
       const side = Math.random() < 0.5 ? "left" : "right";
       const className = fromTop ? pick(["fall-1", "fall-2"]) : pick(["rise-1", "rise-2"]);
-      const colorClass = pick(["lava-accent-1", "lava-accent-2", "lava-accent-3"]);
+      const colorClass: Bubble["colorClass"] = pick(["lava-accent-1", "lava-accent-2", "lava-accent-3"] as const);
       // Size buckets to ensure some much smaller bubbles
       const bucket = Math.random();
       let widthV: number;
