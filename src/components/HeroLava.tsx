@@ -117,20 +117,21 @@ export default function HeroLava({ count = 7 }: { count?: number }) {
         }
 
         const base: CSSProperties = {
-          left: b.left as any,
-          right: b.right as any,
-          top: b.top as any,
-          bottom: b.bottom as any,
+          left: b.left,
+          right: b.right,
+          top: b.top,
+          bottom: b.bottom,
           width: b.width,
           height: b.height,
           // Combine movement with per-bubble opacity cycle
           animation: `${moveAnim}, ${opacityKey} ${total.toFixed(1)}s linear ${b.delay} infinite`,
         };
-        const vars = {
-          ["--inner-stop" as any]: b.innerStop,
-          ["--outer-stop" as any]: b.outerStop,
-          ["--blur" as any]: b.blur,
-        } as any;
+        type CSSVars = { "--inner-stop"?: string; "--outer-stop"?: string; "--blur"?: string };
+        const vars: CSSVars = {
+          "--inner-stop": b.innerStop,
+          "--outer-stop": b.outerStop,
+          "--blur": b.blur,
+        };
         const style = { ...base, ...vars } as CSSProperties;
 
         // Fade between ~20% and 80% opacity, starting near 0% for first cycle visually
