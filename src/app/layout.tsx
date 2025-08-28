@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { resolveAudience } from "@/lib/locale";
+import { getCommonContent } from "@/lib/content";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
@@ -22,11 +24,15 @@ export const metadata: Metadata = {
   description: "Your Career Agent",
 };
 
-export default function RootLayout({
+export const dynamic = 'force-dynamic';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const audience = await resolveAudience();
+  const common = await getCommonContent(audience.cc, audience.lang);
   return (
     <html lang="en">
       <body
@@ -34,12 +40,12 @@ export default function RootLayout({
       >
         <Providers>
           <Suspense fallback={null}>
-            <Header />
+            <Header nav={common.nav} />
           </Suspense>
           {/* Spacer to offset fixed header height on all viewports */}
           <div className="h-14" aria-hidden="true" />
           <div className="flex-1">{children}</div>
-          <Footer />
+          <Footer labels={common.footer} />
           {/* Sitewide GDPR cookie consent drawer */}
           <CookieConsent />
         </Providers>

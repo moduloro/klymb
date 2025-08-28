@@ -7,6 +7,7 @@ export type HomeContent = {
     seekers: { title: string; bullets: string[] };
     employers: { title: string; bullets: string[] };
   };
+  values?: { title: string; body: string };
 };
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
@@ -51,6 +52,31 @@ export async function getHomeContent(cc: string, lang: string): Promise<HomeCont
   const master = (await readJSON<HomeContent>(rel("US", "en")))!;
   const ccEn = await readJSON<DeepPartial<HomeContent>>(rel(cc, "en"));
   const ccLang = await readJSON<DeepPartial<HomeContent>>(rel(cc, lang));
+  let merged = master;
+  if (ccEn) merged = deepMerge(merged, ccEn);
+  if (ccLang) merged = deepMerge(merged, ccLang);
+  return merged;
+}
+
+export type CommonContent = {
+  nav: {
+    seekers: string;
+    employers: string;
+    insights: string;
+    about: string;
+  };
+  footer: {
+    about: string;
+    contact: string;
+    privacy: string;
+  };
+};
+
+export async function getCommonContent(cc: string, lang: string): Promise<CommonContent> {
+  const rel = (a: string, b: string) => `src/content/${a}/${b}/common.json`;
+  const master = (await readJSON<CommonContent>(rel("US", "en")))!;
+  const ccEn = await readJSON<DeepPartial<CommonContent>>(rel(cc, "en"));
+  const ccLang = await readJSON<DeepPartial<CommonContent>>(rel(cc, lang));
   let merged = master;
   if (ccEn) merged = deepMerge(merged, ccEn);
   if (ccLang) merged = deepMerge(merged, ccLang);

@@ -114,11 +114,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
       {/* Shared Values */}
       <section className="mt-12 bg-white">
         <div className="content">
-          <h3 className="text-2xl font-semibold text-brand-text">Work is about people.</h3>
-          <p className="mt-3 text-brand-text/80">
-            We believe careers and companies flourish when people feel supported.
-            That’s why we focus on the human experience behind every role and every hire.
-          </p>
+          {content.values ? (
+            <>
+              <h3 className="text-2xl font-semibold text-brand-text">{content.values.title}</h3>
+              <p className="mt-3 text-brand-text/80">{content.values.body}</p>
+            </>
+          ) : (
+            <>
+              <h3 className="text-2xl font-semibold text-brand-text">Work is about people.</h3>
+              <p className="mt-3 text-brand-text/80">
+                We believe careers and companies flourish when people feel supported.
+                That’s why we focus on the human experience behind every role and every hire.
+              </p>
+            </>
+          )}
         </div>
       </section>
     </main>

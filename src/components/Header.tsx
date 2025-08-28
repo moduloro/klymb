@@ -6,7 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export default function Header() {
+export default function Header({
+  nav,
+}: {
+  nav: { seekers: string; employers: string; insights: string; about: string };
+}) {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -53,6 +57,7 @@ export default function Header() {
             setCurrentLang(j.lang.toLowerCase());
             // Clear any stale query params so header/content remain consistent
             router.replace("/");
+            router.refresh();
           }
         })
         .catch(() => {});
@@ -160,16 +165,16 @@ export default function Header() {
         {/* Center/Right: Nav */}
         <nav className="ml-2 hidden items-center gap-6 text-sm text-brand-text/80 md:flex relative top-[2px]">
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
-            For Job Seekers
+            {nav.seekers}
           </Link>
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
-            For Employers
+            {nav.employers}
           </Link>
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
-            Insights & Resources
+            {nav.insights}
           </Link>
           <Link href="#" className="hover:text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded">
-            About
+            {nav.about}
           </Link>
         </nav>
 
@@ -228,6 +233,7 @@ export default function Header() {
                       params.set("cc", opt.cc);
                       params.set("lang", opt.lang);
                       router.push(`/?${params.toString()}`);
+                      router.refresh();
                       setLocaleOpen(false);
                     }}
                     className="flex w-full items-center gap-2 px-3 py-2 hover:bg-brand-grey-tiles text-left"

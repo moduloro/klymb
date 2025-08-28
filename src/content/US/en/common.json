@@ -1,0 +1,13 @@
+{
+  "nav": {
+    "seekers": "For Job Seekers",
+    "employers": "For Employers",
+    "insights": "Insights & Resources",
+    "about": "About"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy"
+  }
+}
