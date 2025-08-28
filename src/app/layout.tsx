@@ -33,6 +33,8 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
+          {/* Spacer to offset fixed header height on all viewports */}
+          <div className="h-14" aria-hidden="true" />
           <div className="flex-1">{children}</div>
           <Footer />
           {/* Sitewide GDPR cookie consent drawer */}

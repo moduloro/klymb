@@ -182,7 +182,7 @@ export default function CookieConsent() {
                 <button
                   aria-label="Close privacy policy"
                   onClick={closePolicy}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-brand-text hover:bg-brand-grey-tiles focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-brand-text hover:bg-brand-grey-tiles focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
                 >
                   <span className="relative block h-4 w-4" aria-hidden>
                     <span className="absolute left-0 top-1/2 h-0.5 w-4 -translate-y-1/2 rotate-45 bg-current" />
@@ -217,19 +217,19 @@ export default function CookieConsent() {
               <div className="flex flex-row flex-wrap items-center justify-center gap-2 sm:flex-nowrap md:justify-start">
                 <button
                   onClick={rejectAll}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-brand-primary bg-transparent px-4 py-2 text-sm font-medium text-brand-primary"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-brand-primary bg-transparent px-4 py-2 text-sm font-medium text-brand-primary"
                 >
                   Reject all
                 </button>
                 <button
                   onClick={() => setCustomize(true)}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-brand-text hover:underline"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-brand-text hover:underline"
                 >
                   Custom
                 </button>
                 <button
                   onClick={acceptAll}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
                 >
                   Accept all
                 </button>
@@ -270,19 +270,19 @@ export default function CookieConsent() {
               <div className="flex flex-row flex-wrap items-center justify-center gap-2 sm:flex-nowrap sm:justify-end">
                 <button
                   onClick={rejectAll}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-brand-primary bg-transparent px-4 py-2 text-sm font-medium text-brand-primary"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-brand-primary bg-transparent px-4 py-2 text-sm font-medium text-brand-primary"
                 >
                   Reject all
                 </button>
                 <button
                   onClick={acceptAll}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
                 >
                   Accept all
                 </button>
                 <button
                   onClick={savePrefs}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-brand-text hover:underline"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-brand-text hover:underline"
                 >
                   Save preferences
                 </button>

@@ -10,6 +10,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profilePage, setProfilePage] = useState<"overview" | "account">("overview");
+  const [scrolled, setScrolled] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
   function closeProfileDrawer() {
@@ -40,9 +41,39 @@ export default function Header() {
     };
   }, [profileOpen]);
 
+  // Block background scroll when any header drawer is open
+  useEffect(() => {
+    if (open || profileOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => document.body.classList.remove("no-scroll");
+  }, [open, profileOpen]);
+
+  // Toggle subtle drop shadow when page is scrolled behind the fixed header
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 0);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Ensure drawers are mutually exclusive
+  useEffect(() => {
+    if (open) setProfileOpen(false);
+  }, [open]);
+  useEffect(() => {
+    if (profileOpen) setOpen(false);
+  }, [profileOpen]);
+
   return (
     <>
-    <header className="sticky top-0 z-[60] bg-brand-grey-tiles">
+    <header
+      className={`fixed inset-x-0 top-0 z-[60] bg-brand-grey-tiles transition-shadow duration-200 ${
+        scrolled ? "shadow-[0_5px_5px_rgba(0,0,0,0.15)]" : ""
+      }`}
+    >
       <div className="content h-14 flex items-center gap-4">
         {/* Left: Logo */}
         <div className="shrink-0">
@@ -82,6 +113,8 @@ export default function Header() {
                 setProfilePage("overview");
                 return true;
               });
+              // Close other drawers
+              setOpen(false);
             }}
             className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
@@ -111,11 +144,15 @@ export default function Header() {
           {/* Mobile menu toggle */}
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              // Close other drawers and toggle mobile menu
+              setProfileOpen(false);
+              setOpen((v) => !v);
+            }}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-brand-text focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <span className="relative block h-4 w-4">
               <span
@@ -162,20 +199,7 @@ export default function Header() {
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
                 About
               </Link>
-              {/* Footer actions */}
-              <div className="mt-auto pt-4">
-                {!session && (
-                  <button
-                    onClick={() => {
-                      setOpen(false);
-                      signIn("google", { prompt: "select_account" });
-                    }}
-                    className="w-full rounded-md bg-brand-primary px-3 py-2 text-sm font-medium text-white"
-                  >
-                    Sign in
-                  </button>
-                )}
-              </div>
+              {/* Auth actions moved to profile drawer; none in hamburger menu */}
             </nav>
           </div>
         </div>

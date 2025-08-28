@@ -39,6 +39,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Prevent background scroll when drawers are open */
+body.no-scroll {
+  overflow: hidden;
+}
+
 /* Narrow content wrapper (keeps backgrounds full-bleed) */
 .content {
   /* Approximate Apple.com content width */
