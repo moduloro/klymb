@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "title": "Your Career Agent, always by your side.",
+    "subtitle": "We support people and teams through the moments that matter – with clarity, empathy, and practical guidance.",
+    "cta1": "I’m looking for a job",
+    "cta2": "Build the best team"
+  },
+  "tiles": {
+    "seekers": {
+      "title": "For Job Seekers",
+      "bullets": [
+        "Guidance tailored to your goals",
+        "Less stress through each step",
+        "Confidence in every application"
+      ]
+    },
+    "employers": {
+      "title": "For Employers",
+      "bullets": [
+        "Faster hiring with better fit",
+        "Lower costs with smart pipelines",
+        "Retention from day one"
+      ]
+    }
+  }
+}

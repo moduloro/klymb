@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "title": "Ihr Karriere-Begleiter – immer an Ihrer Seite.",
+    "subtitle": "Wir begleiten Menschen und Teams in den entscheidenden Momenten – mit Klarheit, Empathie und praktischer Unterstützung.",
+    "cta1": "Ich suche einen Job",
+    "cta2": "Das beste Team aufbauen"
+  },
+  "tiles": {
+    "seekers": {
+      "title": "Für Jobsuchende",
+      "bullets": [
+        "Individuelle Beratung für Ihre Ziele",
+        "Weniger Stress in jedem Schritt",
+        "Mehr Sicherheit bei jeder Bewerbung"
+      ]
+    },
+    "employers": {
+      "title": "Für Arbeitgeber",
+      "bullets": [
+        "Schneller einstellen – mit besserem Fit",
+        "Geringere Kosten durch smarte Pipelines",
+        "Bindung ab dem ersten Tag"
+      ]
+    }
+  }
+}

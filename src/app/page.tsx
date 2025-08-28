@@ -1,7 +1,11 @@
 import Image from "next/image";
 import HeroLava from "@/components/HeroLava";
+import { resolveAudience } from "@/lib/locale";
+import { getHomeContent } from "@/lib/content";
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams?: { cc?: string; lang?: string } }) {
+  const audience = resolveAudience({ cc: searchParams?.cc ?? null, lang: searchParams?.lang ?? null });
+  const content = await getHomeContent(audience.cc, audience.lang);
   return (
     <main>
       {/* Hero */}
@@ -15,24 +19,23 @@ export default function Home() {
         <div className="relative z-10 content py-16 sm:py-24 text-white">
           <div className="mx-auto max-w-3xl">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl text-center sm:text-center">
-              Your Career Agent,<br /> always by your side.
+              {content.hero.title}
             </h1>
             <p className="mt-4 text-base leading-7 text-white/90 sm:text-lg text-center sm:text-center">
-              We guide people and teams through the moments that matter – with clarity,
-              empathy, and practical support, so you can move forward with confidence.
+              {content.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row justify-center">
               <a
                 href="#"
                 className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand-primary shadow-sm transition hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                I’m looking for a job
+                {content.hero.cta1}
               </a>
               <a
                 href="#"
                 className="inline-flex items-center justify-center rounded-full border border-white px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                Grow the best team
+                {content.hero.cta2}
               </a>
             </div>
           </div>
@@ -58,11 +61,11 @@ export default function Home() {
                 />
               </div>
               <div className="p-6 bg-brand-grey-tiles">
-                <h2 className="text-xl font-semibold text-brand-text">For Job Seekers</h2>
+                <h2 className="text-xl font-semibold text-brand-text">{content.tiles.seekers.title}</h2>
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-brand-text/80">
-                  <li>Guidance tailored to your goals</li>
-                  <li>Less stress through each step</li>
-                  <li>Confidence in every application</li>
+                  {content.tiles.seekers.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
                 </ul>
               </div>
             </a>
@@ -81,11 +84,11 @@ export default function Home() {
                 />
               </div>
               <div className="p-6 bg-brand-grey-tiles">
-                <h2 className="text-xl font-semibold text-brand-text">For Employers</h2>
+                <h2 className="text-xl font-semibold text-brand-text">{content.tiles.employers.title}</h2>
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-brand-text/80">
-                  <li>Faster hiring with better fit</li>
-                  <li>Lower cost through smart pipelines</li>
-                  <li>Retention from day one</li>
+                  {content.tiles.employers.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
                 </ul>
               </div>
             </a>
