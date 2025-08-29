@@ -17,10 +17,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Generate WebP with Squoosh (WebAssembly)
+      - name: Install image tools (ImageMagick + libwebp)
         run: |
-          npx -y @squoosh/cli --resize '{"width":1600}' --webp '{"quality":70}' public/images/youngwoman_laptop2.jpg --output-dir public/images
-          npx -y @squoosh/cli --resize '{"width":1600}' --webp '{"quality":70}' public/images/corp-hr3.jpg --output-dir public/images
+          sudo apt-get update
+          sudo apt-get install -y imagemagick webp
+          convert -version
+          cwebp -version
+      - name: Optimize JPEGs (resize 1600, q=70)
+        run: |
+          set -e
+          convert public/images/youngwoman_laptop2.jpg -resize 1600x -strip -interlace Plane -quality 70 public/images/youngwoman_laptop2.jpg
+          convert public/images/corp-hr3.jpg -resize 1600x -strip -interlace Plane -quality 70 public/images/corp-hr3.jpg
+      - name: Generate WebP variants (q=70)
+        run: |
+          cwebp -q 70 -resize 1600 0 public/images/youngwoman_laptop2.jpg -o public/images/youngwoman_laptop2.webp
+          cwebp -q 70 -resize 1600 0 public/images/corp-hr3.jpg -o public/images/corp-hr3.webp
       - name: Switch homepage to .webp sources
         run: |
           sed -i 's|/images/youngwoman_laptop2\.jpg|/images/youngwoman_laptop2.webp|g' src/app/page.tsx
