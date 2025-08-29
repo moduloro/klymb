@@ -6,6 +6,8 @@ permissions:
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '.github/**'
   release:
     types: [ published ]
   workflow_dispatch:
@@ -33,16 +35,25 @@ jobs:
           echo "Waiting for Render service $RENDER_SERVICE_ID to deploy commit $COMMIT_SHA..."
           sudo apt-get update >/dev/null 2>&1 || true
           sudo apt-get install -y jq >/dev/null 2>&1 || true
-          # Poll up to ~20 minutes
-          for i in $(seq 1 120); do
+          # Poll up to ~30 minutes
+          for i in $(seq 1 180); do
             json=$(curl -sS -H "Authorization: Bearer $RENDER_API_KEY" \
               "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys?limit=20" || true)
             # Find deploy matching this commit
-            status=$(printf "%s" "$json" | jq -r --arg sha "$COMMIT_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].status // empty')
             depId=$(printf "%s" "$json" | jq -r --arg sha "$COMMIT_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].id // empty')
-            echo "Attempt $i: status=${status:-unknown} deployId=${depId:-n/a}"
-            if [ "$status" = "live" ]; then
-              echo "Deploy is live (deployId=$depId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
+            status=$(printf "%s" "$json" | jq -r --arg sha "$COMMIT_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].status // empty')
+            # Fallback to latest deploy if no explicit commit match available
+            if [ -z "$depId" ]; then
+              fbId=$(printf "%s" "$json" | jq -r '.[0].id // empty')
+              fbStatus=$(printf "%s" "$json" | jq -r '.[0].status // empty')
+              echo "Attempt $i: no exact commit match yet; latest status=${fbStatus:-unknown} deployId=${fbId:-n/a}"
+              if [ "$fbStatus" = "live" ] && [ -n "$fbId" ]; then
+                echo "Latest deploy is live (deployId=$fbId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
+            else
+              echo "Attempt $i: matched deploy status=${status:-unknown} deployId=${depId}"
+              if [ "$status" = "live" ]; then
+                echo "Matched deploy is live (deployId=$depId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
+            fi
             sleep 10
           done
           echo "Timed out waiting for Render to deploy commit $COMMIT_SHA" >&2
