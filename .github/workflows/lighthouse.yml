@@ -215,15 +215,20 @@ jobs:
             const desktopLinks = process.env.DESKTOP_LINKS || 'see workflow artifacts';
             const body = `Lighthouse Report${hasIssues ? ' (issues detected)' : ''}\n\nMobile\n\n${format(mobileScores)}\n\nLinks: ${mobileLinks}\n\nDesktop\n\n${format(desktopScores)}\n\nLinks: ${desktopLinks}\n\nRun: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}\nReports branch: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/tree/lh-reports/reports/${process.env.GITHUB_RUN_ID}`;
             require('fs').writeFileSync('email.md', body);
-    - name: Send email
+       - name: Send email
         if: ${{ inputs.send_email == true }}
         uses: dawidd6/action-send-mail@v3
         with:
-          connection_url: ${{ secrets.MAIL_CONNECTION_URL }}  # smtps://USER:PASS@smtp.gmail.com:465
+          server_address: ${{ secrets.MAIL_SERVER }}          # e.g. smtp.gmail.com
+          server_port: ${{ secrets.MAIL_PORT || 465 }}        # 465 for SMTPS, 587 for STARTTLS
+          secure: true                                        # false if using STARTTLS on 587
+          username: ${{ secrets.MAIL_USERNAME }}              # mailbox/login
+          password: ${{ secrets.MAIL_PASSWORD }}              # app password/token
           subject: ${{ steps.prep.outputs.subject }}
           from: ${{ secrets.MAIL_FROM || 'Lighthouse Bot <bot@klymb.work>' }}
           to: ${{ inputs.to || secrets.MAIL_TO || 'info.julita@gmail.com' }}
           html_body: file://email.md
+
 
         env:
           MOBILE_SCORES: ${{ needs.mobile.outputs.scores }}
