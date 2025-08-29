@@ -1,5 +1,5 @@
 name: Lighthouse CI
-# touch: trigger run
+# touch: trigger run post-deploy
 
 permissions:
   contents: write
