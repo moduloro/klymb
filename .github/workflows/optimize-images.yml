@@ -2,6 +2,9 @@ name: Optimize Images
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/optimize-images.trigger
 
 jobs:
   optimize:
