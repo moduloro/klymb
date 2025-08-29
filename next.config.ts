@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Use remotePatterns (domains is deprecated in Next 15)
     remotePatterns: [
       {
         protocol: "https",
