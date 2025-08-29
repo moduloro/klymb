@@ -23,6 +23,10 @@ on:
     workflows: ["Deploy to Render"]
     types: [completed]
 
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   mobile:
     name: Mobile Audit
