@@ -1,14 +1,10 @@
 name: Lighthouse CI
-# Audits live site after Render deploy; also supports manual/PR/nightly
+# Audits live site after Render deploy; supports manual runs
 
 permissions:
   contents: write
 
 on:
-  pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 3 * * *' # run nightly at 03:00 UTC
   workflow_dispatch:
     inputs:
       send_email:
@@ -19,6 +15,8 @@ on:
         description: "Override recipient email"
         required: false
         type: string
+  repository_dispatch:
+    types: [render_deploy_succeeded]
   workflow_run:
     workflows: ["Deploy to Render"]
     types: [completed]
@@ -176,7 +174,7 @@ jobs:
 
   email_report:
     name: Email Report
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
+    if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
     needs: [mobile, desktop]
     runs-on: ubuntu-latest
     steps:
