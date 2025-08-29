@@ -1,4 +1,5 @@
 name: Lighthouse CI
+# touch: trigger run
 
 on:
   push:
