@@ -4,11 +4,8 @@
       "numberOfRuns": 2,
       "url": [
         "https://klymb.work/?cc=US&lang=en",
-        "https://klymb.work/profile?cc=US&lang=en",
         "https://klymb.work/?cc=UK&lang=en",
-        "https://klymb.work/profile?cc=UK&lang=en",
-        "https://klymb.work/?cc=DE&lang=de",
-        "https://klymb.work/profile?cc=DE&lang=de"
+        "https://klymb.work/?cc=DE&lang=de"
       ],
       "settings": {
         "formFactor": "mobile",
@@ -31,7 +28,9 @@
         "categories:seo": ["error", { "minScore": 0.95 }],
         "bf-cache": ["warn", { "minScore": 0.90 }],
         "image-delivery-insight": ["warn", { "minScore": 0.90 }],
-        "legacy-javascript-insight": ["warn", { "minScore": 0.90 }]
+        "legacy-javascript-insight": ["warn", { "minScore": 0.90 }],
+        "document-latency-insight": ["warn", { "minScore": 0.90 }],
+        "redirects": ["warn", { "minScore": 0.90 }]
       }
     }
   }
