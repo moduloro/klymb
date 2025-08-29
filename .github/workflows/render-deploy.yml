@@ -25,38 +25,23 @@ jobs:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
-      - name: Wait for Render to deploy this commit (live)
+      - name: Wait for site BUILD_ID to change (live)
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-          COMMIT_SHA: ${{ github.sha }}
+          SITE_URL: https://klymb.work
         run: |
           set -e
-          echo "Waiting for Render service $RENDER_SERVICE_ID to deploy commit $COMMIT_SHA..."
-          sudo apt-get update >/dev/null 2>&1 || true
-          sudo apt-get install -y jq >/dev/null 2>&1 || true
-          # Poll up to ~30 minutes
+          echo "Fetching current BUILD_ID from $SITE_URL/_next/static/BUILD_ID"
+          BASE_ID=$(curl -fsS "$SITE_URL/_next/static/BUILD_ID" || echo unknown)
+          echo "Baseline BUILD_ID: $BASE_ID"
+          echo "Waiting for BUILD_ID to change (indicates new version is live)..."
           for i in $(seq 1 180); do
-            json=$(curl -sS -H "Authorization: Bearer $RENDER_API_KEY" \
-              "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys?limit=20" || true)
-            # Find deploy matching this commit
-            depId=$(printf "%s" "$json" | jq -r --arg sha "$COMMIT_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].id // empty')
-            status=$(printf "%s" "$json" | jq -r --arg sha "$COMMIT_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].status // empty')
-            # Fallback to latest deploy if no explicit commit match available
-            if [ -z "$depId" ]; then
-              fbId=$(printf "%s" "$json" | jq -r '.[0].id // empty')
-              fbStatus=$(printf "%s" "$json" | jq -r '.[0].status // empty')
-              echo "Attempt $i: no exact commit match yet; latest status=${fbStatus:-unknown} deployId=${fbId:-n/a}"
-              if [ "$fbStatus" = "live" ] && [ -n "$fbId" ]; then
-                echo "Latest deploy is live (deployId=$fbId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
-            else
-              echo "Attempt $i: matched deploy status=${status:-unknown} deployId=${depId}"
-              if [ "$status" = "live" ]; then
-                echo "Matched deploy is live (deployId=$depId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
-            fi
+            CUR_ID=$(curl -fsS "$SITE_URL/_next/static/BUILD_ID" || echo unknown)
+            echo "Attempt $i: BUILD_ID=$CUR_ID"
+            if [ -n "$CUR_ID" ] && [ "$CUR_ID" != "$BASE_ID" ] && [ "$CUR_ID" != "unknown" ]; then
+              echo "Detected new BUILD_ID ($CUR_ID). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
             sleep 10
           done
-          echo "Timed out waiting for Render to deploy commit $COMMIT_SHA" >&2
+          echo "Timed out waiting for BUILD_ID to change at $SITE_URL" >&2
           exit 1
       - name: Notify Lighthouse via repository_dispatch
         env:
