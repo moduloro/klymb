@@ -62,7 +62,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
             <a
               href="#"
               className="group block overflow-hidden rounded-xl bg-white shadow-sm transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-              aria-label="For Job Seekers"
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
@@ -87,7 +86,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
             <a
               href="#"
               className="group block overflow-hidden rounded-xl bg-white shadow-sm transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-              aria-label="For Employers"
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
