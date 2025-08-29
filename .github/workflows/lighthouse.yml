@@ -124,7 +124,6 @@ jobs:
             const body = `Nightly Lighthouse Report\n\nMobile\n\n${format(mobileScores)}\n\nLinks: ${mobileLinks}\n\nDesktop\n\n${format(desktopScores)}\n\nLinks: ${desktopLinks}\n\nRun: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             require('fs').writeFileSync('email.md', body);
       - name: Send email
-        if: ${{ secrets.MAIL_SERVER && secrets.MAIL_USERNAME && secrets.MAIL_PASSWORD }}
         uses: dawidd6/action-send-mail@v3
         with:
           server: ${{ secrets.MAIL_SERVER }}
