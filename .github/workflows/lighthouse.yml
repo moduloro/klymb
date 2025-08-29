@@ -40,13 +40,12 @@ jobs:
         continue-on-error: true
         with:
           configPath: ./lighthouserc-mobile.json
-          uploadArtifacts: false
+          uploadArtifacts: true
+          artifactName: lighthouse-mobile
           temporaryPublicStorage: true
-      - name: Upload artifact (mobile)
-        uses: actions/upload-artifact@v4
-        with:
-            name: lighthouse-mobile
-            path: .lighthouseci/*
+      - name: Debug list LHCI outputs (mobile)
+        run: |
+          echo "Listing .lighthouseci after mobile run" && ls -la .lighthouseci || true
       - name: Publish mobile reports to branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -114,13 +113,12 @@ jobs:
         continue-on-error: true
         with:
           configPath: ./lighthouserc-desktop.json
-          uploadArtifacts: false
+          uploadArtifacts: true
+          artifactName: lighthouse-desktop
           temporaryPublicStorage: true
-      - name: Upload artifact (desktop)
-        uses: actions/upload-artifact@v4
-        with:
-            name: lighthouse-desktop
-            path: .lighthouseci/*
+      - name: Debug list LHCI outputs (desktop)
+        run: |
+          echo "Listing .lighthouseci after desktop run" && ls -la .lighthouseci || true
       - name: Publish desktop reports to branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
