@@ -4,6 +4,7 @@ import { resolveAudience } from "@/lib/locale";
 import { getCommonContent } from "@/lib/content";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./banner-surface.css";
 import Providers from "./providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

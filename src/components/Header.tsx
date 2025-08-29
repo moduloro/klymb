@@ -337,16 +337,16 @@ export default function Header({
           <div className="content py-4">
             <nav className="flex flex-col gap-1 text-brand-text">
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-                For Job Seekers
+                {nav.seekers}
               </Link>
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-                For Employers
+                {nav.employers}
               </Link>
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-                Insights & Resources
+                {nav.insights}
               </Link>
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
-                About
+                {nav.about}
               </Link>
               {/* Auth actions moved to profile drawer; none in hamburger menu */}
             </nav>

@@ -1,10 +1,10 @@
 import Image from "next/image";
-import HeroLava from "@/components/HeroLava";
 import { resolveAudience } from "@/lib/locale";
 import { getHomeContent } from "@/lib/content";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getUserSettings } from "@/lib/userSettings";
+import HeroSurfaceBlended from "@/components/HeroSurfaceBlended";
 
 export const dynamic = 'force-dynamic';
 
@@ -24,11 +24,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
       {/* Hero */}
       <section
         className="relative text-white overflow-hidden"
-        /* Animated gradient background replaces solid color */
+        /* Base solid blue; surface overlay cycles blue ↔ orange */
         style={{ backgroundColor: "var(--brand-primary)" }}
       >
-        {/* Animated lava-lamp gradient background (client-rendered for randomness) */}
-        <HeroLava />
+        {/* Blended surface: uniform cycle with non-uniform patch modulation. */}
+        <HeroSurfaceBlended />
         <div className="relative z-10 content py-16 sm:py-24 text-white">
           <div className="mx-auto max-w-3xl">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl text-center sm:text-center">
