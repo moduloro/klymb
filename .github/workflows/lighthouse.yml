@@ -226,18 +226,7 @@ jobs:
           subject: Lighthouse CI Report - ${{ github.repository }}
           to: info.julita@gmail.com
           from: ${{ secrets.MAIL_FROM }}
-          body: |
-            Hello,
-
-            Please find attached the Lighthouse CI report for ${{ github.repository }}.
-
-            Repository: ${{ github.repository }}
-            Workflow: ${{ github.workflow }}
-            Run Number: ${{ github.run_number }}
-            Run ID: ${{ github.run_id }}
-
-            Regards,
-            GitHub Actions Bot
+          html_body: file://email.md
             
         env:
           MOBILE_SCORES: ${{ needs.mobile.outputs.scores }}
