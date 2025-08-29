@@ -1,0 +1,309 @@
+[
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.5,
+    "values": [
+      0.5,
+      0.5
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "image-delivery-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "auditTitle": "Improve image delivery",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-optimized-images/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.5,
+    "values": [
+      0,
+      0.5
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "legacy-javascript-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "auditTitle": "Legacy JavaScript",
+    "auditDocumentationLink": "https://web.dev/articles/baseline-and-polyfills"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 2,
+    "values": [
+      2,
+      2
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "legacy-javascript",
+    "level": "warn",
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "auditTitle": "Avoid serving legacy JavaScript to modern browsers",
+    "auditDocumentationLink": "https://web.dev/baseline"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.88,
+    "values": [
+      0.28,
+      0.88
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "max-potential-fid",
+    "level": "warn",
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "auditTitle": "Max Potential First Input Delay",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-max-potential-fid/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "https://klymb.work/",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "document-latency-insight",
+    "level": "error",
+    "url": "https://klymb.work/",
+    "auditTitle": "Document request latency"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "image-delivery-insight",
+    "level": "error",
+    "url": "https://klymb.work/",
+    "auditTitle": "Improve image delivery",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-optimized-images/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 2,
+    "values": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "legacy-javascript",
+    "level": "warn",
+    "url": "https://klymb.work/",
+    "auditTitle": "Avoid serving legacy JavaScript to modern browsers",
+    "auditDocumentationLink": "https://web.dev/baseline"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "redirects",
+    "level": "error",
+    "url": "https://klymb.work/",
+    "auditTitle": "Avoid multiple page redirects",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/redirects/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.5,
+    "values": [
+      0,
+      0.5
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "image-delivery-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "auditTitle": "Improve image delivery",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-optimized-images/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "lcp-discovery-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "auditTitle": "LCP request discovery",
+    "auditDocumentationLink": "https://web.dev/articles/optimize-lcp#1_eliminate_resource_load_delay"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 2,
+    "values": [
+      2,
+      2
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "legacy-javascript",
+    "level": "warn",
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "auditTitle": "Avoid serving legacy JavaScript to modern browsers",
+    "auditDocumentationLink": "https://web.dev/baseline"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "image-delivery-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "auditTitle": "Improve image delivery",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-optimized-images/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "lcp-discovery-insight",
+    "level": "error",
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "auditTitle": "LCP request discovery",
+    "auditDocumentationLink": "https://web.dev/articles/optimize-lcp#1_eliminate_resource_load_delay"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 2,
+    "values": [
+      2,
+      2
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "legacy-javascript",
+    "level": "warn",
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "auditTitle": "Avoid serving legacy JavaScript to modern browsers",
+    "auditDocumentationLink": "https://web.dev/baseline"
+  }
+]

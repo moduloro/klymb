@@ -1,0 +1,146 @@
+[
+  {
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_08.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_08.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=US&lang=en",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_11_20.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_11_20.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_59.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_59.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=UK&lang=en",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_12_24.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_12_24.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_12_50.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_12_50.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=DE&lang=de",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_13_04.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_13_04.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/?cc=US&lang=en",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_10_54.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_10_54.report.json",
+    "summary": {
+      "performance": 0.85,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=US&lang=en",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_11_34.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_11_34.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/?cc=UK&lang=en",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_46.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_11_46.report.json",
+    "summary": {
+      "performance": 0.99,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=UK&lang=en",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_12_12.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_12_12.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/?cc=DE&lang=de",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_12_37.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work--2025_08_29_09_12_37.report.json",
+    "summary": {
+      "performance": 0.99,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://klymb.work/profile?cc=DE&lang=de",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_13_17.report.html",
+    "jsonPath": "/home/runner/work/klymb/klymb/.lighthouseci/klymb_work-profile-2025_08_29_09_13_17.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1
+    }
+  }
+]
