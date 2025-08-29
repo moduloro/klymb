@@ -17,34 +17,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install sharp
+      - name: Generate WebP with Squoosh (WebAssembly)
         run: |
-          npm i sharp@^0.33
-      - name: Optimize homepage images (JPEG + WebP)
-        run: |
-          node - <<'NODE'
-          const sharp = require('sharp');
-          async function process(base){
-            const jpg = `public/images/${base}.jpg`;
-            const webp = `public/images/${base}.webp`;
-            await sharp(jpg)
-              .resize({width:1600, withoutEnlargement:true})
-              .jpeg({quality:70, progressive:true})
-              .toFile(jpg);
-            await sharp(jpg)
-              .resize({width:1600, withoutEnlargement:true})
-              .webp({quality:70})
-              .toFile(webp);
-          }
-          (async () => {
-            await process('youngwoman_laptop2');
-            await process('corp-hr3');
-          })().catch(err => { console.error(err); process.exit(1); });
-          NODE
+          npx -y @squoosh/cli --resize '{"width":1600}' --webp '{"quality":70}' public/images/youngwoman_laptop2.jpg --output-dir public/images
+          npx -y @squoosh/cli --resize '{"width":1600}' --webp '{"quality":70}' public/images/corp-hr3.jpg --output-dir public/images
       - name: Switch homepage to .webp sources
         run: |
           sed -i 's|/images/youngwoman_laptop2\.jpg|/images/youngwoman_laptop2.webp|g' src/app/page.tsx
