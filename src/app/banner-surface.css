@@ -1,0 +1,44 @@
+@media (prefers-reduced-motion: reduce) {
+  .banner-surface { animation: none !important; }
+}
+
+.banner-surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Overlay color (orange) fades over base blue */
+  background: var(--brand-accent);
+  opacity: 0; /* start blue */
+  /* Full cycle duration set via CSS var; default 30s (15s up + 15s down). */
+  animation: surface-cycle var(--surface-total, 30s) ease-in-out var(--surface-delay, 0s) infinite;
+}
+
+/* Keep blue->orange timing; shorten orange->blue by finishing fade earlier */
+@keyframes surface-cycle {
+  0% { opacity: 0; }
+  50% { opacity: 1; }  /* reach full orange at midpoint */
+  52% { opacity: 1; }  /* brief plateau */
+  90% { opacity: 0; }  /* complete fade back sooner */
+  100% { opacity: 0; } /* longer blue plateau before next cycle */
+}
+
+/* Non-uniform variant: multiple animated orange patches with soft masks */
+.banner-patches { position: absolute; inset: 0; pointer-events: none; }
+.banner-patch {
+  position: absolute;
+  inset: 0;
+  background: var(--brand-accent);
+  opacity: 0;
+  /* Soft circular mask; supported widely, include webkit prefix for Safari */
+  -webkit-mask-image: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #fff 0 var(--r1, 20%), transparent var(--r2, 35%));
+  mask-image: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #fff 0 var(--r1, 20%), transparent var(--r2, 35%));
+  animation: patch-cycle var(--surface-total, 30s) var(--patch-ease, ease-in-out) var(--surface-delay, 0s) infinite;
+}
+
+@keyframes patch-cycle {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  52% { opacity: 1; }
+  90% { opacity: 0; }
+  100% { opacity: 0; }
+}

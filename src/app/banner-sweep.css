@@ -1,0 +1,40 @@
+@property --sweep {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --feather {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 6%;
+}
+
+/* Full-bleed overlay that animates from blue to orange by growing an orange area
+   with a soft leading edge that disappears at the end (fully orange by 15s). */
+.banner-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* The base section keeps blue; we overlay an orange sweep with soft edge */
+  background: linear-gradient(var(--dir, to right), var(--brand-accent) 0 calc(var(--sweep) - var(--feather)), transparent var(--sweep) 100%);
+  animation: sweep-progress 15s linear forwards;
+}
+
+/* Direction helpers */
+.from-left { --dir: to right; transform-origin: left center; animation-name: sweep-progress-x; }
+.from-right { --dir: to left; transform-origin: right center; animation-name: sweep-progress-x; }
+.from-top { --dir: to bottom; transform-origin: center top; animation-name: sweep-progress-y; }
+.from-bottom { --dir: to top; transform-origin: center bottom; animation-name: sweep-progress-y; }
+
+/* Progress animates custom properties, and we scale along the travel axis for smoother GPU perf */
+@keyframes sweep-progress-x {
+  0% { --sweep: 0%; --feather: 6%; transform: scaleX(0); }
+  90% { --sweep: 90%; --feather: 6%; }
+  100% { --sweep: 100%; --feather: 0%; transform: scaleX(1); }
+}
+@keyframes sweep-progress-y {
+  0% { --sweep: 0%; --feather: 6%; transform: scaleY(0); }
+  90% { --sweep: 90%; --feather: 6%; }
+  100% { --sweep: 100%; --feather: 0%; transform: scaleY(1); }
+}
+
