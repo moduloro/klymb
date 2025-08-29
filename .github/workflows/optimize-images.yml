@@ -1,5 +1,9 @@
 name: Optimize Images
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   workflow_dispatch:
   push:
@@ -17,19 +21,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install sharp-cli
+      - name: Verify sharp-cli availability
         run: |
-          npm -g i sharp-cli
+          npx -y sharp-cli --version || true
       - name: Optimize homepage images (JPEG)
         run: |
           set -e
           # Resize to max width 1600px, quality 70, progressive
-          npx sharp public/images/youngwoman_laptop2.jpg resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/youngwoman_laptop2.jpg
-          npx sharp public/images/corp-hr3.jpg resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/corp-hr3.jpg
+          npx -y sharp-cli public/images/youngwoman_laptop2.jpg --resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/youngwoman_laptop2.jpg
+          npx -y sharp-cli public/images/corp-hr3.jpg --resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/corp-hr3.jpg
       - name: Also generate WebP variants
         run: |
-          npx sharp public/images/youngwoman_laptop2.jpg resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/youngwoman_laptop2.webp
-          npx sharp public/images/corp-hr3.jpg resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/corp-hr3.webp
+          npx -y sharp-cli public/images/youngwoman_laptop2.jpg --resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/youngwoman_laptop2.webp
+          npx -y sharp-cli public/images/corp-hr3.jpg --resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/corp-hr3.webp
       - name: Switch homepage to .webp sources
         run: |
           sed -i 's|/images/youngwoman_laptop2\.jpg|/images/youngwoman_laptop2.webp|g' src/app/page.tsx
