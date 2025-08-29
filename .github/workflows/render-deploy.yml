@@ -25,26 +25,33 @@ jobs:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
-      - name: Wait for site BUILD_ID to change (live, cache-busted)
+      - name: Wait for version change via /api/version (fallback to BUILD_ID)
         env:
           SITE_URL: https://klymb.work
         run: |
           set -e
-          echo "Fetching baseline BUILD_ID with cache-busting"
+          echo "Fetching baseline version with cache-busting"
           TS=$(date +%s%N)
-          BASE_ID=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/_next/static/BUILD_ID?ts=$TS" || echo unknown)
-          echo "Baseline BUILD_ID: $BASE_ID"
-          echo "Waiting for BUILD_ID to change (new version live)..."
+          BASE_JSON=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/api/version?ts=$TS" || echo '{}')
+          BASE_COMMIT=$(printf "%s" "$BASE_JSON" | jq -r '.commit // empty')
+          BASE_BUILD=$(printf "%s" "$BASE_JSON" | jq -r '.buildId // empty')
+          echo "Baseline: commit=${BASE_COMMIT:-n/a} buildId=${BASE_BUILD:-n/a}"
+          echo "Waiting for version change..."
           for i in $(seq 1 180); do
             TS_LOOP=$(date +%s%N)
-            CUR_ID=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/_next/static/BUILD_ID?ts=$TS_LOOP" || echo unknown)
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL/_next/static/BUILD_ID?ts=$TS_LOOP")
-            echo "Attempt $i: status=$CODE BUILD_ID=$CUR_ID"
-            if [ -n "$CUR_ID" ] && [ "$CUR_ID" != "$BASE_ID" ] && [ "$CUR_ID" != "unknown" ]; then
-              echo "Detected new BUILD_ID ($CUR_ID). Allowing 45s for CDN propagation..."; sleep 45; exit 0; fi
+            CUR_JSON=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/api/version?ts=$TS_LOOP" || echo '{}')
+            CUR_COMMIT=$(printf "%s" "$CUR_JSON" | jq -r '.commit // empty')
+            CUR_BUILD=$(printf "%s" "$CUR_JSON" | jq -r '.buildId // empty')
+            echo "Attempt $i: commit=${CUR_COMMIT:-n/a} buildId=${CUR_BUILD:-n/a}"
+            if { [ -n "$CUR_COMMIT" ] && [ "$CUR_COMMIT" != "$BASE_COMMIT" ]; } || { [ -n "$CUR_BUILD" ] && [ "$CUR_BUILD" != "$BASE_BUILD" ]; }; then
+              echo "Detected version change (commit/buildId). Allowing 45s for CDN propagation..."; sleep 45; exit 0; fi
+            # Fallback: BUILD_ID file if version route unavailable
+            CUR_ID=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/_next/static/BUILD_ID?ts=$TS_LOOP" || true)
+            if [ -n "$CUR_ID" ] && [ "$CUR_ID" != "unknown" ] && [ "$CUR_ID" != "$BASE_BUILD" ]; then
+              echo "Detected fallback BUILD_ID change ($CUR_ID). Allowing 45s for CDN propagation..."; sleep 45; exit 0; fi
             sleep 10
           done
-          echo "Timed out waiting for BUILD_ID to change at $SITE_URL" >&2
+          echo "Timed out waiting for version change at $SITE_URL" >&2
           exit 1
       - name: Notify Lighthouse via repository_dispatch
         env:
