@@ -331,10 +331,12 @@ export default function Header({
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="mobile-menu-title"
         className={`fixed left-0 right-0 top-14 z-40 h-[56vh] max-h-[56vh] transform bg-brand-grey-tiles transition-transform duration-200 shadow-[0_10px_10px_rgba(0,0,0,0.15)] ${open ? "translate-y-0" : "-translate-y-[100vh]"}`}
       >
         <div className="h-full overflow-auto">
           <div className="content py-4">
+            <h2 id="mobile-menu-title" className="sr-only">Main menu</h2>
             <nav className="flex flex-col gap-1 text-brand-text">
               <Link href="#" className="rounded px-2 py-2 hover:bg-brand-grey-tiles" onClick={() => setOpen(false)}>
                 {nav.seekers}
@@ -365,6 +367,7 @@ export default function Header({
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="profile-drawer-title"
         className={`fixed left-0 right-0 top-14 z-40 h-[56vh] max-h-[56vh] transform bg-brand-grey-tiles transition-transform duration-200 shadow-[0_10px_10px_rgba(0,0,0,0.15)] ${profileOpen ? "translate-y-0" : "-translate-y-[100vh]"}`}
       >
         <div ref={profileRef} className="h-full overflow-auto">
@@ -372,7 +375,7 @@ export default function Header({
             {profilePage === "overview" ? (
               <>
                 <div className="flex items-start justify-between">
-                  <h2 className="text-lg font-semibold text-brand-text">Your profile</h2>
+                  <h2 id="profile-drawer-title" className="text-lg font-semibold text-brand-text">Your profile</h2>
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <Image
@@ -422,7 +425,7 @@ export default function Header({
             ) : (
               <div className="relative h-full">
                 <div className="flex items-start justify-between">
-                  <h2 className="text-lg font-semibold text-brand-text">Account</h2>
+                  <h2 id="profile-drawer-title" className="text-lg font-semibold text-brand-text">Account</h2>
                   <button
                     onClick={() => setProfilePage("overview")}
                     className="text-xs text-brand-text/70 hover:text-brand-text focus:outline-none"
