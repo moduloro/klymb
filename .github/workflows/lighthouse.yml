@@ -58,13 +58,20 @@ jobs:
             git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(reports): init branch" || true
           fi
           mkdir -p reports/${GITHUB_RUN_ID}/mobile
-          cp -r .lighthouseci/* reports/${GITHUB_RUN_ID}/mobile/
+          if [ -d .lighthouseci ] && ls -A .lighthouseci >/dev/null 2>&1; then
+            cp -r .lighthouseci/* reports/${GITHUB_RUN_ID}/mobile/ || true
+          else
+            echo "No lighthouse output for mobile job" > reports/${GITHUB_RUN_ID}/mobile/NO_REPORTS.txt
+          fi
           rm -rf reports/latest
           mkdir -p reports
           cp -r reports/${GITHUB_RUN_ID} reports/latest
           git add reports README.md || true
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(reports): add mobile run ${GITHUB_RUN_ID}" || echo "no changes"
-          git push -u origin lh-reports
+          for i in 1 2 3; do
+            git pull --rebase origin lh-reports || true
+            git push -u origin lh-reports && break || sleep 2
+          done
       - name: Summarize scores (mobile)
         id: summarize
         uses: actions/github-script@v7
@@ -124,13 +131,20 @@ jobs:
             git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(reports): init branch" || true
           fi
           mkdir -p reports/${GITHUB_RUN_ID}/desktop
-          cp -r .lighthouseci/* reports/${GITHUB_RUN_ID}/desktop/
+          if [ -d .lighthouseci ] && ls -A .lighthouseci >/dev/null 2>&1; then
+            cp -r .lighthouseci/* reports/${GITHUB_RUN_ID}/desktop/ || true
+          else
+            echo "No lighthouse output for desktop job" > reports/${GITHUB_RUN_ID}/desktop/NO_REPORTS.txt
+          fi
           rm -rf reports/latest
           mkdir -p reports
           cp -r reports/${GITHUB_RUN_ID} reports/latest
           git add reports README.md || true
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(reports): add desktop run ${GITHUB_RUN_ID}" || echo "no changes"
-          git push -u origin lh-reports
+          for i in 1 2 3; do
+            git pull --rebase origin lh-reports || true
+            git push -u origin lh-reports && break || sleep 2
+          done
       - name: Summarize scores (desktop)
         id: summarize
         uses: actions/github-script@v7
