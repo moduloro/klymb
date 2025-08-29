@@ -65,7 +65,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
-                  src="/images/youngwoman_laptop2.jpg"
+                  src="/images/youngwoman_laptop2.webp"
                   alt="For Job Seekers"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
@@ -92,7 +92,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
             >
               <div className="relative h-40 w-full overflow-hidden md:h-48">
                 <Image
-                  src="/images/corp-hr3.jpg"
+                  src="/images/corp-hr3.webp"
                   alt="For Employers"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
