@@ -21,19 +21,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Verify sharp-cli availability
+      - name: Install sharp
         run: |
-          npx -y sharp-cli --version || true
-      - name: Optimize homepage images (JPEG)
+          npm i sharp@^0.33
+      - name: Optimize homepage images (JPEG + WebP)
         run: |
-          set -e
-          # Resize to max width 1600px, quality 70, progressive
-          npx -y sharp-cli public/images/youngwoman_laptop2.jpg --resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/youngwoman_laptop2.jpg
-          npx -y sharp-cli public/images/corp-hr3.jpg --resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/corp-hr3.jpg
-      - name: Also generate WebP variants
-        run: |
-          npx -y sharp-cli public/images/youngwoman_laptop2.jpg --resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/youngwoman_laptop2.webp
-          npx -y sharp-cli public/images/corp-hr3.jpg --resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/corp-hr3.webp
+          node - <<'NODE'
+          const sharp = require('sharp');
+          async function process(base){
+            const jpg = `public/images/${base}.jpg`;
+            const webp = `public/images/${base}.webp`;
+            await sharp(jpg)
+              .resize({width:1600, withoutEnlargement:true})
+              .jpeg({quality:70, progressive:true})
+              .toFile(jpg);
+            await sharp(jpg)
+              .resize({width:1600, withoutEnlargement:true})
+              .webp({quality:70})
+              .toFile(webp);
+          }
+          (async () => {
+            await process('youngwoman_laptop2');
+            await process('corp-hr3');
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
       - name: Switch homepage to .webp sources
         run: |
           sed -i 's|/images/youngwoman_laptop2\.jpg|/images/youngwoman_laptop2.webp|g' src/app/page.tsx
