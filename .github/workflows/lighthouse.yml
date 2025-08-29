@@ -1,12 +1,10 @@
 name: Lighthouse CI
-# touch: trigger run post-deploy
+# Audits live site after Render deploy; also supports manual/PR/nightly
 
 permissions:
   contents: write
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
   schedule:
@@ -21,10 +19,15 @@ on:
         description: "Override recipient email"
         required: false
         type: string
+  workflow_run:
+    workflows: ["Deploy to Render"]
+    types: [completed]
 
 jobs:
   mobile:
     name: Mobile Audit
+    needs: [wait_for_deploy]
+    if: github.event_name != 'workflow_run' || needs.wait_for_deploy.result == 'success'
     runs-on: ubuntu-latest
     outputs:
       links: ${{ steps.lhci.outputs.links }}
@@ -97,7 +100,8 @@ jobs:
 
   desktop:
     name: Desktop Audit
-    needs: mobile
+    needs: [wait_for_deploy, mobile]
+    if: github.event_name != 'workflow_run' || needs.wait_for_deploy.result == 'success'
     runs-on: ubuntu-latest
     outputs:
       links: ${{ steps.lhci.outputs.links }}
@@ -235,6 +239,23 @@ jobs:
             await github.rest.issues.createComment({owner, repo, issue_number, body});
         env:
           MOBILE_SCORES: ${{ needs.mobile.outputs.scores }}
+  wait_for_deploy:
+    name: Wait For Render Deploy
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll production URL until 200
+        run: |
+          url="https://klymb.work/"
+          echo "Polling $url for readiness..."
+          for i in {1..40}; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" "$url" || echo 000)
+            echo "Attempt $i HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "Ready"; exit 0; fi
+            sleep 10
+          done
+          echo "Timed out waiting for deploy"; exit 1
           DESKTOP_SCORES: ${{ needs.desktop.outputs.scores }}
           MOBILE_LINKS: ${{ needs.mobile.outputs.links }}
           DESKTOP_LINKS: ${{ needs.desktop.outputs.links }}
