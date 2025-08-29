@@ -173,8 +173,8 @@ jobs:
             core.setOutput('scores', JSON.stringify(result));
 
   email_report:
-    name: Nightly Email Report
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
+    name: Email Report
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
     needs: [mobile, desktop]
     runs-on: ubuntu-latest
     steps:
@@ -195,9 +195,23 @@ jobs:
             }
             const mobileScores = JSON.parse(process.env.MOBILE_SCORES || '[]');
             const desktopScores = JSON.parse(process.env.DESKTOP_SCORES || '[]');
+            const thresholds = { mobile: { performance: 70, accessibility: 90, bestPractices: 95, seo: 95 }, desktop: { performance: 85, accessibility: 90, bestPractices: 95, seo: 95 } };
+            function below(items, t) {
+              return items.some(x => {
+                const p = Math.round((x.performance ?? 0)*100);
+                const a = Math.round((x.accessibility ?? 0)*100);
+                const b = Math.round((x.bestPractices ?? 0)*100);
+                const s = Math.round((x.seo ?? 0)*100);
+                return p < t.performance || a < t.accessibility || b < t.bestPractices || s < t.seo;
+              });
+            }
+            const mobileFail = below(mobileScores, thresholds.mobile);
+            const desktopFail = below(desktopScores, thresholds.desktop);
+            const hasIssues = mobileFail || desktopFail;
+            core.setOutput('subject', `Lighthouse Report${hasIssues ? ' [ALERT]' : ''}`);
             const mobileLinks = process.env.MOBILE_LINKS || 'see workflow artifacts';
             const desktopLinks = process.env.DESKTOP_LINKS || 'see workflow artifacts';
-            const body = `Nightly Lighthouse Report\n\nMobile\n\n${format(mobileScores)}\n\nLinks: ${mobileLinks}\n\nDesktop\n\n${format(desktopScores)}\n\nLinks: ${desktopLinks}\n\nRun: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}\nReports branch: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/tree/lh-reports/reports/${process.env.GITHUB_RUN_ID}`;
+            const body = `Lighthouse Report${hasIssues ? ' (issues detected)' : ''}\n\nMobile\n\n${format(mobileScores)}\n\nLinks: ${mobileLinks}\n\nDesktop\n\n${format(desktopScores)}\n\nLinks: ${desktopLinks}\n\nRun: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}\nReports branch: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/tree/lh-reports/reports/${process.env.GITHUB_RUN_ID}`;
             require('fs').writeFileSync('email.md', body);
       - name: Send email
         uses: dawidd6/action-send-mail@v3
@@ -207,7 +221,7 @@ jobs:
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: Nightly Lighthouse Report
+          subject: ${{ steps.prep.outputs.subject }}
           from: ${{ secrets.MAIL_FROM || secrets.MAIL_USERNAME }}
           to: ${{ inputs.to || secrets.MAIL_TO || 'info.julita@gmail.com' }}
           html_body: file://email.md
