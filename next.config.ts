@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ["image/avif", "image/webp"],
+    // Pre-configure allowed quality values to silence Next 16 warning
+    qualities: [60],
   },
 };
 
