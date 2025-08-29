@@ -26,5 +26,19 @@
     "prisma": "^5.19.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "browserslist": {
+    "production": [
+      "last 2 chrome versions",
+      "last 2 safari versions",
+      "last 2 firefox versions",
+      "not dead",
+      "supports es6-module"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 safari version",
+      "last 1 firefox version"
+    ]
   }
 }

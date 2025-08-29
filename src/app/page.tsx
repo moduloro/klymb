@@ -69,8 +69,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
                   alt="For Job Seekers"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
+                  quality={70}
                   className="object-cover"
+                  // Improve LCP: eagerly load the first above-the-fold tile image
                   priority
+                  fetchPriority="high"
                 />
               </div>
               <div className="p-6 bg-brand-grey-tiles">
@@ -93,6 +96,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
                   alt="For Employers"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
+                  quality={70}
                   className="object-cover"
                 />
               </div>
