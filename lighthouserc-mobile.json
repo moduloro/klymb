@@ -15,7 +15,8 @@
           "height": 640,
           "deviceScaleFactor": 2,
           "disabled": false
-        }
+        },
+        "budgetsPath": "./lighthouse-budgets.json"
       }
     },
     "assert": {
@@ -29,4 +30,3 @@
     }
   }
 }
-
