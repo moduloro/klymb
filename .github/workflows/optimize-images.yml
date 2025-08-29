@@ -37,24 +37,30 @@ jobs:
           sed -i 's|/images/youngwoman_laptop2\.jpg|/images/youngwoman_laptop2.webp|g' src/app/page.tsx
           sed -i 's|/images/corp-hr3\.jpg|/images/corp-hr3.webp|g' src/app/page.tsx
       - name: Commit changes
+        id: commit
         run: |
           branch="chore/optimize-images-${GITHUB_RUN_ID}"
           git checkout -b "$branch"
           git add public/images/youngwoman_laptop2.* public/images/corp-hr3.* src/app/page.tsx
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(images): optimize homepage images (resize 1600, q=70), add WebP variants, and switch homepage to .webp"
           git push -u origin "$branch"
-      - name: Open Pull Request
-        uses: peter-evans/create-pull-request@v6
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+      - name: Open PR (existing branch)
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ steps.commit.outputs.branch }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(images): optimize homepage images (resize 1600, q=70) and add WebP variants"
-          title: "Optimize homepage images"
-          body: |
-            This PR optimizes the homepage tile images by resizing to max-width 1600px and recompressing to quality=70.
-
-            - Updated JPEGs in-place
-            - Added `.webp` variants for future use
-
-            After merge + deploy, Lighthouse's image delivery insight should improve.
-          branch: "$branch"
-          base: main
+          script: |
+            const {owner, repo} = context.repo;
+            const head = process.env.BRANCH;
+            const base = 'main';
+            const title = 'Optimize homepage images';
+            const body = `This PR optimizes the homepage tile images by resizing to max-width 1600px and recompressing to quality=70.\n\n- Updated JPEGs in-place\n- Added .webp variants\n- Switched homepage to .webp sources\n\nAfter merge + deploy, Lighthouse image delivery should improve.`;
+            if (!head) { core.setFailed('Missing branch name'); return }
+            const prs = await github.paginate(github.rest.pulls.list, {owner, repo, state: 'open', head: `${owner}:${head}`, base});
+            if (prs.length === 0) {
+              await github.rest.pulls.create({owner, repo, head, base, title, body});
+              core.info(`Opened PR for ${head}`);
+            } else {
+              core.info(`PR already exists for ${head}`);
+            }
