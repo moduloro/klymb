@@ -17,9 +17,6 @@ on:
         type: string
   repository_dispatch:
     types: [render_deploy_succeeded]
-  workflow_run:
-    workflows: ["Deploy to Render"]
-    types: [completed]
 
 concurrency:
   group: lighthouse-${{ github.ref }}
@@ -28,8 +25,7 @@ concurrency:
 jobs:
   mobile:
     name: Mobile Audit
-    needs: [wait_for_deploy]
-    if: github.event_name != 'workflow_run' || needs.wait_for_deploy.result == 'success'
+    # Runs on repository_dispatch or manual
     runs-on: ubuntu-latest
     outputs:
       links: ${{ steps.lhci.outputs.links }}
@@ -101,8 +97,7 @@ jobs:
 
   desktop:
     name: Desktop Audit
-    needs: [wait_for_deploy, mobile]
-    if: github.event_name != 'workflow_run' || needs.wait_for_deploy.result == 'success'
+    needs: [mobile]
     runs-on: ubuntu-latest
     outputs:
       links: ${{ steps.lhci.outputs.links }}
@@ -174,7 +169,7 @@ jobs:
 
   email_report:
     name: Email Report
-    if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
+    if: github.event_name == 'repository_dispatch' || (github.event_name == 'workflow_dispatch' && inputs.send_email == true)
     needs: [mobile, desktop]
     runs-on: ubuntu-latest
     steps:
@@ -253,47 +248,3 @@ jobs:
             await github.rest.issues.createComment({owner, repo, issue_number, body});
         env:
           MOBILE_SCORES: ${{ needs.mobile.outputs.scores }}
-  wait_for_deploy:
-    name: Wait For Render Deploy
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for Render deploy (API) or fallback to HTTP
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -e
-          url="https://klymb.work/"
-          echo "Waiting for deploy..."
-          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
-            echo "Using Render API to poll deploy for commit $HEAD_SHA on service $RENDER_SERVICE_ID"
-            sudo apt-get update >/dev/null 2>&1 || true
-            sudo apt-get install -y jq >/dev/null 2>&1 || true
-            for i in {1..180}; do
-              json=$(curl -sS -H "Authorization: Bearer $RENDER_API_KEY" \
-                "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys?limit=10" || true)
-              # Try to match deploy associated with this commit SHA (field names vary)
-              deployId=$(printf "%s" "$json" | jq -r --arg sha "$HEAD_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].id // empty')
-              status=$(printf "%s" "$json" | jq -r --arg sha "$HEAD_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].status // empty')
-              echo "Attempt $i: commit=$HEAD_SHA deploy=${deployId:-not-found} status=${status:-unknown}"
-              if [ -n "$deployId" ] && [ "$status" = "live" ]; then
-                echo "Render deploy for commit $HEAD_SHA is live (id=$deployId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
-              sleep 10
-            done
-            echo "Timed out waiting for Render deploy of commit $HEAD_SHA to become live via API"; exit 1
-          else
-            echo "RENDER_API_KEY/RENDER_SERVICE_ID not set; falling back to HTTP 200 polling at $url"
-            for i in {1..60}; do
-              code=$(curl -sS -o /dev/null -w "%{http_code}" "$url" || echo 000)
-              echo "Attempt $i HTTP $code"
-              if [ "$code" = "200" ]; then
-                echo "Ready (HTTP 200). Allowing 10s for CDN warmup..."; sleep 10; exit 0; fi
-              sleep 10
-            done
-            echo "Timed out waiting for HTTP 200 at $url"; exit 1
-          fi
-          DESKTOP_SCORES: ${{ needs.desktop.outputs.scores }}
-          MOBILE_LINKS: ${{ needs.mobile.outputs.links }}
-          DESKTOP_LINKS: ${{ needs.desktop.outputs.links }}
