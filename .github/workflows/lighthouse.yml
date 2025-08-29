@@ -260,23 +260,27 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -e
           url="https://klymb.work/"
           echo "Waiting for deploy..."
           if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
-            echo "Using Render API to poll latest deploy status for service $RENDER_SERVICE_ID"
-            for i in {1..120}; do
+            echo "Using Render API to poll deploy for commit $HEAD_SHA on service $RENDER_SERVICE_ID"
+            sudo apt-get update >/dev/null 2>&1 || true
+            sudo apt-get install -y jq >/dev/null 2>&1 || true
+            for i in {1..180}; do
               json=$(curl -sS -H "Authorization: Bearer $RENDER_API_KEY" \
-                "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys?limit=1" || true)
-              status=$(printf "%s" "$json" | jq -r '.[0].status // .status // empty')
-              deployId=$(printf "%s" "$json" | jq -r '.[0].id // empty')
-              echo "Attempt $i: status=${status:-unknown} id=${deployId:-n/a}"
-              if [ "$status" = "live" ]; then
-                echo "Render deploy is live (id=$deployId). Allowing 15s for CDN propagation..."; sleep 15; exit 0; fi
+                "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys?limit=10" || true)
+              # Try to match deploy associated with this commit SHA (field names vary)
+              deployId=$(printf "%s" "$json" | jq -r --arg sha "$HEAD_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].id // empty')
+              status=$(printf "%s" "$json" | jq -r --arg sha "$HEAD_SHA" '[.[] | select(((.commitId // empty) == $sha) or ((.commit // empty) == $sha) or ((.gitCommitId // empty) == $sha))][0].status // empty')
+              echo "Attempt $i: commit=$HEAD_SHA deploy=${deployId:-not-found} status=${status:-unknown}"
+              if [ -n "$deployId" ] && [ "$status" = "live" ]; then
+                echo "Render deploy for commit $HEAD_SHA is live (id=$deployId). Allowing 30s for CDN propagation..."; sleep 30; exit 0; fi
               sleep 10
             done
-            echo "Timed out waiting for Render deploy to become live via API"; exit 1
+            echo "Timed out waiting for Render deploy of commit $HEAD_SHA to become live via API"; exit 1
           else
             echo "RENDER_API_KEY/RENDER_SERVICE_ID not set; falling back to HTTP 200 polling at $url"
             for i in {1..60}; do
