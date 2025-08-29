@@ -1,0 +1,52 @@
+name: Optimize Images
+
+on:
+  workflow_dispatch:
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install sharp-cli
+        run: |
+          npm -g i sharp-cli
+      - name: Optimize homepage images (JPEG)
+        run: |
+          set -e
+          # Resize to max width 1600px, quality 70, progressive
+          npx sharp public/images/youngwoman_laptop2.jpg resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/youngwoman_laptop2.jpg
+          npx sharp public/images/corp-hr3.jpg resize 1600 --withoutEnlargement --quality 70 --progressive --to-format=jpeg --output public/images/corp-hr3.jpg
+      - name: Also generate WebP variants
+        run: |
+          npx sharp public/images/youngwoman_laptop2.jpg resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/youngwoman_laptop2.webp
+          npx sharp public/images/corp-hr3.jpg resize 1600 --withoutEnlargement --quality 70 --to-format=webp --output public/images/corp-hr3.webp
+      - name: Commit changes
+        run: |
+          branch="chore/optimize-images-${GITHUB_RUN_ID}"
+          git checkout -b "$branch"
+          git add public/images/youngwoman_laptop2.* public/images/corp-hr3.*
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(images): optimize homepage images (resize 1600, q=70) and add WebP variants"
+          git push -u origin "$branch"
+      - name: Open Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(images): optimize homepage images (resize 1600, q=70) and add WebP variants"
+          title: "Optimize homepage images"
+          body: |
+            This PR optimizes the homepage tile images by resizing to max-width 1600px and recompressing to quality=70.
+
+            - Updated JPEGs in-place
+            - Added `.webp` variants for future use
+
+            After merge + deploy, Lighthouse's image delivery insight should improve.
+          branch: "$branch"
+          base: main
+
