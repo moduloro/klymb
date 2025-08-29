@@ -1,6 +1,9 @@
 name: Lighthouse CI
 # touch: trigger run
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ main ]
@@ -192,8 +195,7 @@ jobs:
           if git ls-remote --exit-code --heads origin lh-reports; then
             git checkout -B lh-reports origin/lh-reports
           else
-            git checkout --orphan lh-reports
-            rm -rf ./* .[^.]* 2>/dev/null || true
+            git checkout -B lh-reports
             echo "Lighthouse reports branch" > README.md
             git add README.md
             git commit -m "chore(reports): init branch" || true
@@ -217,6 +219,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add reports
+          git add reports README.md || true
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "chore(reports): add run ${GITHUB_RUN_ID}" || echo "no changes"
           git push -u origin lh-reports
