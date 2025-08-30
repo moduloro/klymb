@@ -4,13 +4,7 @@ permissions:
   contents: write
 
 on:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '.github/**'
-  release:
-    types: [ published ]
-  workflow_dispatch:
+  workflow_dispatch:   # Manual trigger from Actions tab only
 
 concurrency:
   group: render-deploy-${{ github.ref }}
@@ -24,7 +18,12 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Missing secret: RENDER_DEPLOY_HOOK_URL" >&2
+            exit 1
+          fi
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
+
       - name: Wait for version change via /api/version (fallback to BUILD_ID)
         env:
           SITE_URL: https://klymb.work
@@ -45,7 +44,6 @@ jobs:
             echo "Attempt $i: commit=${CUR_COMMIT:-n/a} buildId=${CUR_BUILD:-n/a}"
             if { [ -n "$CUR_COMMIT" ] && [ "$CUR_COMMIT" != "$BASE_COMMIT" ]; } || { [ -n "$CUR_BUILD" ] && [ "$CUR_BUILD" != "$BASE_BUILD" ]; }; then
               echo "Detected version change (commit/buildId). Allowing 45s for CDN propagation..."; sleep 45; exit 0; fi
-            # Fallback: BUILD_ID file if version route unavailable
             CUR_ID=$(curl -fsSL -H 'Cache-Control: no-cache' "$SITE_URL/_next/static/BUILD_ID?ts=$TS_LOOP" || true)
             if [ -n "$CUR_ID" ] && [ "$CUR_ID" != "unknown" ] && [ "$CUR_ID" != "$BASE_BUILD" ]; then
               echo "Detected fallback BUILD_ID change ($CUR_ID). Allowing 45s for CDN propagation..."; sleep 45; exit 0; fi
@@ -53,6 +51,7 @@ jobs:
           done
           echo "Timed out waiting for version change at $SITE_URL" >&2
           exit 1
+
       - name: Notify Lighthouse via repository_dispatch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
